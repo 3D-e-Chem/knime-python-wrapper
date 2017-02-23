@@ -5,6 +5,17 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [Unreleased]
 
+### Added
+
+* Set node warning message from Python
+* Allow changing of number and names of input and output tables,
+  default is 1 input table called `input_table` in Python
+  and 1 output table called `output_table` in Python.
+
+### Fixed
+
+* Give proper exception when Python file is missing (#1)
+
 ## [1.0.0] - 2016-07-11
 
 ### Added

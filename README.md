@@ -45,10 +45,19 @@ To do this add `nl.esciencecenter.e3dchem.knime.python` as a required plugin to 
 ## 3. Implement node
 
 Create your node config class extended from the `nl.esciencecenter.e3dchem.python.PythonWrapperNodeConfig` class.
-Add fields you want to have in the node dialog and be available inside the Python script inside the `options` dictionary.
+Inside Python script the following variables are special:
+
+* `options`, dictionary filled from Java with PythonWrapperNodeConfig.getOptionsValues() method, to read from
+* `input_table`, Pandas Dataframe with input data table, to read from
+* `output_table`, Pandas Dataframe with output data table, to assign with value
+* `flow_variables`, dictionary of flow variables, to get or put key/value pairs
+  * `flow_variables['warning_message']`, if key exists then value will be set as warning message of node
 
 Create your node model class extended from the `nl.esciencecenter.e3dchem.python.PythonWrapperNodeModel` class.
 Overwrite the `python_code_filename` and `required_python_packages` fields in the constructor.
+
+PythonWrapperNodeConfig and PythonWrapperNodeModel class are setup for a single input table called `input_table` and a single output table called `output_table`.
+To change the the number and names of input and/or output tables, create sub-classes from them and override the constructor in both sub-classes.
 
 ## 4. Write tests
 
