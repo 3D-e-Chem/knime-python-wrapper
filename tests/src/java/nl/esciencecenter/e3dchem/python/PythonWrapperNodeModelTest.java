@@ -1,19 +1,21 @@
 package nl.esciencecenter.e3dchem.python;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyDouble;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.eq;
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +27,7 @@ import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeModelWarningListener;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 import org.knime.python.kernel.PythonKernel;
@@ -140,5 +143,27 @@ public class PythonWrapperNodeModelTest {
 		verify(kernel, times(1)).putDataTable(eq("input_table"), eq(inData[0]), eq(monitor));
 		verify(kernel).execute(anyString(), eq(exec));
 		verify(kernel, times(1)).getDataTable(eq("output_table"), eq(exec), eq(monitor));
+	}
+
+	@Test
+	public void testExecuteKernel__warningMessageSet() throws IOException, Exception {
+		ConcreteNodeModel model = new ConcreteNodeModel();
+		BufferedDataTable[] inData = { mock(BufferedDataTable.class) };
+		ExecutionContext exec = mock(ExecutionContext.class);
+		PythonKernel kernel = mock(PythonKernel.class);
+		String[] externalOutput = { "stdout", "stderr" };
+		when(kernel.execute(anyString(), eq(exec))).thenReturn(externalOutput);
+		ExecutionMonitor monitor = mock(ExecutionMonitor.class);
+		when(exec.createSubProgress(anyDouble())).thenReturn(monitor);
+		Collection<FlowVariable> variables = new HashSet<FlowVariable>();
+		variables.add(new FlowVariable("warning_message", "some warning"));
+		when(kernel.getFlowVariables(eq("flow_variables"))).thenReturn(variables);
+		NodeModelWarningListener listener = mock(NodeModelWarningListener.class);
+		model.addWarningListener(listener);
+
+		model.executeKernel(inData, exec, kernel);
+
+		verify(listener, times(1)).warningChanged(eq("some warning"));
+		assertEquals(variables, model.variables);
 	}
 }
