@@ -4,6 +4,7 @@ Used for development of KNIME nodes calling Python scripts.
 [![Build Status](https://travis-ci.org/3D-e-Chem/knime-python-wrapper.svg?branch=master)](https://travis-ci.org/3D-e-Chem/knime-python-wrapper)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a3d5b851ea49449cb30c3ed9c8381335)](https://www.codacy.com/app/3D-e-Chem/knime-python-wrapper?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=3D-e-Chem/knime-python-wrapper&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/a3d5b851ea49449cb30c3ed9c8381335)](https://www.codacy.com/app/3D-e-Chem/knime-python-wrapper?utm_source=github.com&utm_medium=referral&utm_content=3D-e-Chem/knime-python-wrapper&utm_campaign=Badge_Coverage)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.321904.svg)](https://doi.org/10.5281/zenodo.321904)
 
 The nodes in Scripting>Python folder of the node repository (nodes part of the `KNIME Python integration` plugin) the end-user needs to paste Python code in a text area in the node dialog.
 Nodes derived from this repo will have a Python script included in their jar file and the dialog of the node will contain no source code text area.
