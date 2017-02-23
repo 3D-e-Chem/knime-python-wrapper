@@ -4,5 +4,11 @@ jdk: oraclejdk8
 cache:
   directories:
    - $HOME/.m2
+   - $HOME/jpm
 install: mvn package -B
 script: mvn verify -B
+before_cache:
+- wget -nc -O ~/.m2/jpm4j.jar https://github.com/jpm4j/jpm4j.installers/raw/master/dist/biz.aQute.jpm.run.jar
+- java -jar $HOME/.m2/jpm4j.jar -u install com.codacy:codacy-coverage-reporter:assembly
+- $HOME/jpm/bin/codacy-coverage-reporter -l Java -r tests/target/jacoco/report/jacoco.xml
+
