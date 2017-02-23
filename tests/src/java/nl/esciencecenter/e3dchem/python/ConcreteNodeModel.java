@@ -7,7 +7,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 
 public class ConcreteNodeModel extends PythonWrapperNodeModel<ConcreteNodeConfig> {
-	public Collection<FlowVariable> variables;
+	private Collection<FlowVariable> variables;
 
 	public ConcreteNodeModel(PortType[] inPortTypes, PortType[] outPortTypes) {
 		super(inPortTypes, outPortTypes);
@@ -17,7 +17,7 @@ public class ConcreteNodeModel extends PythonWrapperNodeModel<ConcreteNodeConfig
 
 	public ConcreteNodeModel() {
 		this(new PortType[] { BufferedDataTable.TYPE }, new PortType[] { BufferedDataTable.TYPE });
-	};
+	}
 
 	@Override
 	protected void addNewVariables(Collection<FlowVariable> newVariables) {
@@ -25,6 +25,10 @@ public class ConcreteNodeModel extends PythonWrapperNodeModel<ConcreteNodeConfig
 		// because private data structures of superclass can not be setup
 		// so override it
 		this.variables = newVariables;
+	}
+
+	public Collection<FlowVariable> getVariables() {
+		return variables;
 	}
 
 	@Override

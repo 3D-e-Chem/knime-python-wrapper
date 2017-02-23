@@ -119,7 +119,7 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 						// Old variable has the same value
 						push = false;
 					} else if (variable.getType().equals(Type.DOUBLE)
-							&& new Double(oldVariable.getDoubleValue()).equals(new Double(variable.getDoubleValue()))) {
+							&& Double.valueOf(oldVariable.getDoubleValue()).equals(Double.valueOf(variable.getDoubleValue()))) {
 						// Old variable has the same value
 						push = false;
 					} else if (variable.getType().equals(Type.STRING)

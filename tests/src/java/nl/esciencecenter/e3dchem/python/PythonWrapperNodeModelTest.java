@@ -105,7 +105,7 @@ public class PythonWrapperNodeModelTest {
 	}
 
 	@Test
-	public void getPythonCode() throws IOException, Exception {
+	public void getPythonCode() throws IOException {
 		ConcreteNodeModel model = new ConcreteNodeModel();
 
 		String code = model.getPythonCode();
@@ -115,7 +115,7 @@ public class PythonWrapperNodeModelTest {
 	}
 
 	@Test
-	public void getPythonCode_missingpyfile() throws IOException, Exception {
+	public void getPythonCode_missingpyfile() throws IOException {
 		FoobarNodeModel model = new FoobarNodeModel();
 		thrown.expect(FileNotFoundException.class);
 		thrown.expectMessage("foobar_test.py");
@@ -124,7 +124,7 @@ public class PythonWrapperNodeModelTest {
 	}
 
 	@Test
-	public void testExecuteKernel() throws IOException, Exception {
+	public void testExecuteKernel() throws Exception {
 		ConcreteNodeModel model = new ConcreteNodeModel();
 		BufferedDataTable[] inData = { mock(BufferedDataTable.class) };
 		ExecutionContext exec = mock(ExecutionContext.class);
@@ -146,7 +146,7 @@ public class PythonWrapperNodeModelTest {
 	}
 
 	@Test
-	public void testExecuteKernel__warningMessageSet() throws IOException, Exception {
+	public void testExecuteKernel__warningMessageSet() throws Exception {
 		ConcreteNodeModel model = new ConcreteNodeModel();
 		BufferedDataTable[] inData = { mock(BufferedDataTable.class) };
 		ExecutionContext exec = mock(ExecutionContext.class);
@@ -164,6 +164,6 @@ public class PythonWrapperNodeModelTest {
 		model.executeKernel(inData, exec, kernel);
 
 		verify(listener, times(1)).warningChanged(eq("some warning"));
-		assertEquals(variables, model.variables);
+		assertEquals(variables, model.getVariables());
 	}
 }
