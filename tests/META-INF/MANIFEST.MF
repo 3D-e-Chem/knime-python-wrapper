@@ -11,4 +11,9 @@ Require-Bundle: org.junit;bundle-version="4.12.0",
  nl.esciencecenter.e3dchem.python.plugin,
  org.knime.python
 Bundle-Vendor: Netherlands eScience Center
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib/mockito-core-2.7.11.jar,
+ lib/mockito-inline-2.7.11.jar,
+ lib/byte-buddy-1.6.5.jar,
+ lib/byte-buddy-agent-1.6.5.jar,
+ lib/objenesis-2.5.jar
