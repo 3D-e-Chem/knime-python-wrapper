@@ -5,12 +5,17 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [Unreleased]
 
+## [1.1.0] - 2017-02-23
+
 ### Added
 
 * Set node warning message from Python
 * Allow changing of number and names of input and output tables,
   default is 1 input table called `input_table` in Python
   and 1 output table called `output_table` in Python.
+* Test coverage
+* More tests
+* Codacy integration
 
 ### Fixed
 
