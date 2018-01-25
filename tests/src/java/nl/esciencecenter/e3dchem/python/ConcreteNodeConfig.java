@@ -2,9 +2,6 @@ package nl.esciencecenter.e3dchem.python;
 
 import java.util.Set;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.workflow.FlowVariable;
 
 /**
@@ -18,16 +15,5 @@ public class ConcreteNodeConfig extends PythonWrapperNodeConfig {
 		Set<FlowVariable> variables = super.getOptionsValues();
 		variables.add(new FlowVariable("column_name", "column1"));
 		return variables;
-	}
-
-	@Override
-	public void saveTo(NodeSettingsWO settings) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void loadFrom(NodeSettingsRO settings) throws InvalidSettingsException {
-		// TODO Auto-generated method stub
 	}
 }

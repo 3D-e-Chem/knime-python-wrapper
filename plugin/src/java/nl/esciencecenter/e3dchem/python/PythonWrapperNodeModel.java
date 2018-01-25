@@ -23,7 +23,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 import org.knime.core.node.workflow.FlowVariable.Type;
-import org.knime.python.kernel.PythonKernel;
+import org.knime.python2.kernel.PythonKernel;
 
 /**
  * Implements a {@link NodeModel} for nodes that launch external Python script.
@@ -56,7 +56,7 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	protected BufferedDataTable[] execute(BufferedDataTable[] inData, ExecutionContext exec) throws Exception {
 		// Below has been copied from Knime Python node source code and
 		// adjusted.
-		PythonKernel kernel = new PythonKernel();
+		PythonKernel kernel = new PythonKernel(getConfig().getKernelOptions());
 		try {
 			return executeKernel(inData, exec, kernel);
 		} finally {
@@ -67,10 +67,11 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	public BufferedDataTable[] executeKernel(BufferedDataTable[] inData, ExecutionContext exec, PythonKernel kernel)
 			throws IOException, Exception {
 		C config = getConfig();
-		BufferedDataTable[] outData = new BufferedDataTable[config.getVariableNames().getOutputTables().length];
 		kernel.putFlowVariables(config.getVariableNames().getFlowVariables(), getAvailableFlowVariables().values());
-		for (int i = 0; i < config.getVariableNames().getInputTables().length; i++) {
-			kernel.putDataTable(config.getVariableNames().getInputTables()[i], inData[i], exec.createSubProgress(0.3));
+		int nrInputTables = config.getVariableNames().getInputTables().length;
+		double inputProgressStep = 0.3 / nrInputTables;
+		for (int i = 0; i < nrInputTables; i++) {
+			kernel.putDataTable(config.getVariableNames().getInputTables()[i], inData[i], exec.createSubProgress(inputProgressStep));
 		}
 		// Make the options from the node dialog via the PythonWrapperNodeConfig
 		// instance available in the Python script
@@ -86,9 +87,12 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 			}
 		}
 		addNewVariables(variables);
-		for (int i = 0; i < config.getVariableNames().getOutputTables().length; i++) {
+		int nrOutputTables = config.getVariableNames().getOutputTables().length;
+		BufferedDataTable[] outData = new BufferedDataTable[nrOutputTables];
+		double outProgressStep = 0.3 / nrOutputTables;
+		for (int i = 0; i < nrOutputTables; i++) {
 			outData[i] = kernel.getDataTable(config.getVariableNames().getOutputTables()[i], exec,
-					exec.createSubProgress(0.3));
+					exec.createSubProgress(outProgressStep));
 		}
 		return outData;
 	}
@@ -118,8 +122,8 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 							&& oldVariable.getIntValue() == variable.getIntValue()) {
 						// Old variable has the same value
 						push = false;
-					} else if (variable.getType().equals(Type.DOUBLE)
-							&& Double.valueOf(oldVariable.getDoubleValue()).equals(Double.valueOf(variable.getDoubleValue()))) {
+					} else if (variable.getType().equals(Type.DOUBLE) && Double.valueOf(oldVariable.getDoubleValue())
+							.equals(Double.valueOf(variable.getDoubleValue()))) {
 						// Old variable has the same value
 						push = false;
 					} else if (variable.getType().equals(Type.STRING)
@@ -204,9 +208,12 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	 */
 	public void validPython() throws InvalidSettingsException {
 		if (required_python_packages.isEmpty()) {
-			return;
+			return; // Nothing to check
 		}
-		String pythonCommand = org.knime.python.Activator.getPythonCommand();
+		String pythonCommand = org.knime.python2.Activator.getPython2Command();
+		if (getConfig().getKernelOptions().getUsePython3()) {
+			pythonCommand = org.knime.python2.Activator.getPython3Command();
+		}
 		String program = required_python_packages.stream().map(p -> "import " + p).collect(Collectors.joining(";"));
 		ProcessBuilder pb = new ProcessBuilder(pythonCommand, "-c", program);
 		try {

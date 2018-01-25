@@ -3,7 +3,11 @@ package nl.esciencecenter.e3dchem.python;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.knime.code.generic.VariableNames;
+import org.knime.python2.extensions.serializationlibrary.SentinelOption;
+import org.knime.python2.extensions.serializationlibrary.SerializationOptions;
+import org.knime.python2.generic.VariableNames;
+import org.knime.python2.kernel.PythonKernelOptions;
+import org.knime.python2.kernel.PythonKernelOptions.PythonVersionOption;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -17,10 +21,20 @@ import org.knime.core.node.workflow.FlowVariable;
  *
  */
 public abstract class PythonWrapperNodeConfig {
+	static final int DEFAULT_ROW_LIMIT = 1000;
 	protected final String pythonOptions = "options";
 	protected final String flowVariables = "flow_variables";
 	protected final String warningMessageFlowVariable = "warning_message";
 	protected final VariableNames variableNames;
+	private static final String CFG_ROW_LIMIT = "rowLimit";
+	private int rowLimit = DEFAULT_ROW_LIMIT;
+	private static final String CFG_PYTHON_VERSION_OPTION = "pythonVersionOption";
+	private static final String CFG_CONVERT_MISSING_TO_PYTHON = "convertMissingToPython";
+	private static final String CFG_CONVERT_MISSING_FROM_PYTHON = "convertMissingFromPython";
+	private static final String CFG_SENTINEL_OPTION = "sentinelOption";
+	private static final String CFG_SENTINEL_VALUE = "sentinelValue";
+	private static final String CFG_CHUNK_SIZE = "chunkSize";
+	private PythonKernelOptions kernelOptions = new PythonKernelOptions();
 
 	public PythonWrapperNodeConfig() {
 		this(new String[] { "input_table" }, new String[] { "output_table" });
@@ -61,7 +75,15 @@ public abstract class PythonWrapperNodeConfig {
 	 * @param settings
 	 *            The settings to save to
 	 */
-	public abstract void saveTo(final NodeSettingsWO settings);
+	public void saveTo(final NodeSettingsWO settings) {
+		settings.addInt(CFG_ROW_LIMIT, rowLimit);
+		settings.addString(CFG_PYTHON_VERSION_OPTION, kernelOptions.getPythonVersionOption().name());
+		settings.addBoolean(CFG_CONVERT_MISSING_TO_PYTHON, kernelOptions.getConvertMissingToPython());
+		settings.addBoolean(CFG_CONVERT_MISSING_FROM_PYTHON, kernelOptions.getConvertMissingFromPython());
+		settings.addString(CFG_SENTINEL_OPTION, kernelOptions.getSentinelOption().name());
+		settings.addInt(CFG_SENTINEL_VALUE, kernelOptions.getSentinelValue());
+		settings.addInt(CFG_CHUNK_SIZE, kernelOptions.getChunkSize());
+	}
 
 	/**
 	 * Load configuration from the given node settings.
@@ -71,7 +93,42 @@ public abstract class PythonWrapperNodeConfig {
 	 * @throws InvalidSettingsException
 	 *             If the settings are invalid
 	 */
-	public abstract void loadFrom(final NodeSettingsRO settings) throws InvalidSettingsException;
+	public void loadFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+		rowLimit = settings.getInt(CFG_ROW_LIMIT, DEFAULT_ROW_LIMIT);
+		kernelOptions.setPythonVersionOption(PythonVersionOption.valueOf(
+				settings.getString(CFG_PYTHON_VERSION_OPTION, kernelOptions.getPreferencePythonVersion().name())));
+		kernelOptions.setConvertMissingToPython(settings.getBoolean(CFG_CONVERT_MISSING_TO_PYTHON,
+				SerializationOptions.DEFAULT_CONVERT_MISSING_TO_PYTHON));
+		kernelOptions.setConvertMissingFromPython(settings.getBoolean(CFG_CONVERT_MISSING_FROM_PYTHON,
+				SerializationOptions.DEFAULT_CONVERT_MISSING_FROM_PYTHON));
+		kernelOptions.setSentinelOption(SentinelOption
+				.valueOf(settings.getString(CFG_SENTINEL_OPTION, SerializationOptions.DEFAULT_SENTINEL_OPTION.name())));
+		kernelOptions
+				.setSentinelValue(settings.getInt(CFG_SENTINEL_VALUE, SerializationOptions.DEFAULT_SENTINEL_VALUE));
+		kernelOptions.setChunkSize(settings.getInt(CFG_CHUNK_SIZE, PythonKernelOptions.DEFAULT_CHUNK_SIZE));
+	}
+
+	/**
+	 * Load configuration from the given node settings (using defaults if
+	 * necessary).
+	 *
+	 * @param settings
+	 *            The settings to load from
+	 */
+	public void loadFromInDialog(final NodeSettingsRO settings) {
+		rowLimit = settings.getInt(CFG_ROW_LIMIT, DEFAULT_ROW_LIMIT);
+		kernelOptions.setPythonVersionOption(PythonVersionOption.valueOf(
+				settings.getString(CFG_PYTHON_VERSION_OPTION, kernelOptions.getPreferencePythonVersion().name())));
+		kernelOptions.setConvertMissingToPython(settings.getBoolean(CFG_CONVERT_MISSING_TO_PYTHON,
+				SerializationOptions.DEFAULT_CONVERT_MISSING_TO_PYTHON));
+		kernelOptions.setConvertMissingFromPython(settings.getBoolean(CFG_CONVERT_MISSING_FROM_PYTHON,
+				SerializationOptions.DEFAULT_CONVERT_MISSING_FROM_PYTHON));
+		kernelOptions.setSentinelOption(SentinelOption
+				.valueOf(settings.getString(CFG_SENTINEL_OPTION, SerializationOptions.DEFAULT_SENTINEL_OPTION.name())));
+		kernelOptions
+				.setSentinelValue(settings.getInt(CFG_SENTINEL_VALUE, SerializationOptions.DEFAULT_SENTINEL_VALUE));
+		kernelOptions.setChunkSize(settings.getInt(CFG_CHUNK_SIZE, PythonKernelOptions.DEFAULT_CHUNK_SIZE));
+	}
 
 	/**
 	 * Set of key/value pairs which inside Python script will be a dictionary
@@ -83,4 +140,37 @@ public abstract class PythonWrapperNodeConfig {
 		Set<FlowVariable> variables = new HashSet<FlowVariable>();
 		return variables;
 	}
+
+	public int getRowLimit() {
+		return rowLimit;
+	}
+
+	public void setRowLimit(int rowLimit) {
+		this.rowLimit = rowLimit;
+	}
+
+    /**
+     * Sets the internal {@link PythonKernelOptions} to a new object created using the specified parameters.
+     *
+     * @param versionOption the version options
+     * @param convertToPython convert missing values to sentinel on the way to python
+     * @param convertFromPython convert sentinel to missing values on the way from python to KNIME
+     * @param sentinelOption the sentinel option
+     * @param sentinelValue the sentinel value (only used if sentinelOption is CUSTOM)
+     * @param chunkSize the number of rows to transfer per chunk
+     */
+    public void setKernelOptions(final PythonVersionOption versionOption, final boolean convertToPython,
+        final boolean convertFromPython, final SentinelOption sentinelOption, final int sentinelValue, final int chunkSize) {
+        kernelOptions =
+                new PythonKernelOptions(versionOption, convertToPython, convertFromPython, sentinelOption, sentinelValue, chunkSize);
+    }
+
+    /**
+     * Gets the python kernel options.
+     *
+     * @return the python kernel options
+     */
+    public PythonKernelOptions getKernelOptions() {
+        return new PythonKernelOptions(kernelOptions);
+    }
 }

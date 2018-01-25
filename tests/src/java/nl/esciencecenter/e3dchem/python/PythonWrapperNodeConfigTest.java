@@ -8,6 +8,8 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettings;
 import org.knime.core.node.workflow.FlowVariable;
 
 public class PythonWrapperNodeConfigTest {
@@ -53,5 +55,48 @@ public class PythonWrapperNodeConfigTest {
 		CustomTablesConfig config1 = new CustomTablesConfig();
 		assertArrayEquals(new String[] { "output_table1", "output_table2" },
 				config1.getVariableNames().getOutputTables());
+	}
+
+	@Test
+	public void testGetRowLimit() {
+		int result = config.getRowLimit();
+		int expected = PythonWrapperNodeConfig.DEFAULT_ROW_LIMIT;
+		assertEquals(expected, result);
+	}
+
+	@Test
+	public void testSetRowLimit() {
+		config.setRowLimit(42);
+
+		assertEquals(42, config.getRowLimit());
+	}
+
+	@Test
+	public void testSaveTo() throws InvalidSettingsException {
+		NodeSettings settings = new NodeSettings("python-wrapper");
+
+		config.saveTo(settings);
+
+		assertEquals(1000, settings.getInt("rowLimit"));
+	}
+
+	@Test
+	public void testLoadFrom() throws InvalidSettingsException {
+		NodeSettings settings = new NodeSettings("python-wrapper");
+		settings.addInt("rowLimit", 42);
+
+		config.loadFrom(settings);
+
+		assertEquals(42, config.getRowLimit());
+	}
+
+	@Test
+	public void testLoadFromInDialog() throws InvalidSettingsException {
+		NodeSettings settings = new NodeSettings("python-wrapper");
+		settings.addInt("rowLimit", 42);
+
+		config.loadFromInDialog(settings);
+
+		assertEquals(42, config.getRowLimit());
 	}
 }

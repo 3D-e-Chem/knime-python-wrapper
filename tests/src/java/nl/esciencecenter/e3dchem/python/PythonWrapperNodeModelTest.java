@@ -30,7 +30,9 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModelWarningListener;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
-import org.knime.python.kernel.PythonKernel;
+import org.knime.python2.extensions.serializationlibrary.SentinelOption;
+import org.knime.python2.kernel.PythonKernel;
+import org.knime.python2.kernel.PythonKernelOptions.PythonVersionOption;
 
 public class PythonWrapperNodeModelTest {
 	@Rule
@@ -81,6 +83,15 @@ public class PythonWrapperNodeModelTest {
 
 	}
 
+	public class NoReqsNodeModelPy3 extends NoReqsNodeModel {
+		@Override
+		protected ConcreteNodeConfig createConfig() {
+			ConcreteNodeConfig config = new ConcreteNodeConfig();
+			config.setKernelOptions(PythonVersionOption.PYTHON3, false, false, SentinelOption.MAX_VAL, 0, 100);
+			return config;
+		}
+	}
+
 	@Test
 	public void testValidPython_JsonPackage_PackageInstalled() throws InvalidSettingsException {
 		JsonNodeModel model = new JsonNodeModel();
@@ -100,6 +111,13 @@ public class PythonWrapperNodeModelTest {
 	@Test
 	public void testValidPython_NoPackageequired() throws InvalidSettingsException {
 		NoReqsNodeModel model = new NoReqsNodeModel();
+
+		model.validPython();
+	}
+
+	@Test
+	public void testValidPython_Python3() throws InvalidSettingsException {
+		NoReqsNodeModelPy3 model = new NoReqsNodeModelPy3();
 
 		model.validPython();
 	}
