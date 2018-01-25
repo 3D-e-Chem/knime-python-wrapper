@@ -14,7 +14,7 @@ The included Python script is not editable by the end-user, but can read options
 
 Requirements:
 
-* KNIME SDK, https://www.knime.org, version 3.1 or higher
+* KNIME SDK, https://www.knime.org, version 3.5 or higher
 
 Instructions for KNIME node developers that want to call a Python script.
 Several steps must be performed:
@@ -68,6 +68,8 @@ This can be done by calling `PythonWrapperTestUtils.materializeKNIMEPythonUtils(
 
 # Build
 
+To build the plugin and run the tests run the following command:
+
 ```
 mvn verify
 ```
@@ -86,16 +88,25 @@ Steps to get development environment setup:
 3. Start SDK
 4. Install m2e (Maven integration for Eclipse) + KNIME Python Integration
 
-    1. Goto Help > Install new software ...
-    2. Make sure Update site is http://update.knime.org/analytics-platform/3.1 is in the pull down list otherwise add it
-    3. Select --all sites-- in work with pulldown
-    4. Select m2e (Maven integration for Eclipse)
-    5. Select `KNIME Python Integration`
-    6. Install software & restart
+    1. Goto Window -> Preferences -> Install/Update -> Available Software Sites
+    2. Make sure the following Software Sites are present otherwise add them:
+
+      * http://update.knime.org/analytics-platform/3.5
+      * http://download.eclipse.org/eclipse/updates/4.6
+      * http://download.eclipse.org/releases/neon
+
+    3. Goto Help -> Check for updates
+    4. Install any updates found & restart
+    5. Goto Help > Install new software ...
+    6. Select --All Available sites-- in work with pulldown
+    7. Wait for list to be filled, `Pending...` should disappear
+    7. Select `m2e - Maven integration for Eclipse (includes Incubating components)`
+    8. Select `KNIME Python Integration`
+    9. Install software & restart
 
 5. Import this repo as an Existing Maven project
 
-During import the Tycho Eclipse providers must be installed.
+After the import the Maven plugin connections must be setup, a Discover m2e connections dialog will popup to install all requested connectors, after the installation restart eclipse.
 
 # New release
 
