@@ -33,6 +33,8 @@
         <tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.organization>3d-e-chem</sonar.organization>
     </properties>
     <repositories>
         <repository>
@@ -117,9 +119,18 @@
                             <artifactId>tycho-buildtimestamp-jgit</artifactId>
                             <version>${tycho.extras.version}</version>
                         </dependency>
+                        <dependency>
+							<groupId>org.eclipse.tycho.extras</groupId>
+							<artifactId>tycho-sourceref-jgit</artifactId>
+							<version>${tycho.extras.version}</version>
+						</dependency>
                     </dependencies>
                     <configuration>
                         <timestampProvider>jgit</timestampProvider>
+                        <sourceReferences>
+							<generate>true</generate>
+						</sourceReferences>
+						<format>'v'yyyyMMddHHmm</format>
                     </configuration>
                 </plugin>
             </plugins>

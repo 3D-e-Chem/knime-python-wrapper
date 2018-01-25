@@ -2,8 +2,9 @@ Abstract Python wrapper KNIME node and helpers.
 Used for development of KNIME nodes calling Python scripts.
 
 [![Build Status](https://travis-ci.org/3D-e-Chem/knime-python-wrapper.svg?branch=master)](https://travis-ci.org/3D-e-Chem/knime-python-wrapper)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a3d5b851ea49449cb30c3ed9c8381335)](https://www.codacy.com/app/3D-e-Chem/knime-python-wrapper?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=3D-e-Chem/knime-python-wrapper&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/a3d5b851ea49449cb30c3ed9c8381335)](https://www.codacy.com/app/3D-e-Chem/knime-python-wrapper?utm_source=github.com&utm_medium=referral&utm_content=3D-e-Chem/knime-python-wrapper&utm_campaign=Badge_Coverage)
+[![Build status](https://ci.appveyor.com/api/projects/status/y7u4n23sjo25pyg8/branch/master?svg=true)](https://ci.appveyor.com/project/3D-e-Chem/knime-python-wrapper/branch/master)
+[![SonarCloud Gate](https://sonarcloud.io/api/badges/gate?key=nl.esciencecenter.e3dchem.python:nl.esciencecenter.e3dchem.python)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.e3dchem.python:nl.esciencecenter.e3dchem.python)
+[![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=nl.esciencecenter.e3dchem.python:nl.esciencecenter.e3dchem.python&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=nl.esciencecenter.e3dchem.python:nl.esciencecenter.e3dchem.python)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.321904.svg)](https://doi.org/10.5281/zenodo.321904)
 
 The nodes in Scripting>Python folder of the node repository (nodes part of the `KNIME Python integration` plugin) the end-user needs to paste Python code in a text area in the node dialog.
