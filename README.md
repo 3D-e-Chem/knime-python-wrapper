@@ -111,7 +111,7 @@ After the import the Maven plugin connections must be setup, a Discover m2e conn
 
 # New release
 
-1. Update versions in pom files with `mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion=<version>` command.
+1. Update versions in pom files with `mvn org.eclipse.tycho:tycho-versions-plugin:set-version -DnewVersion=<version>-SNAPSHOT` command.
 2. Manually update version of "source" feature in `p2/category.xml` file.
 3. Commit and push changes
 3. Create package with `mvn package`, will create update site in `p2/target/repository`

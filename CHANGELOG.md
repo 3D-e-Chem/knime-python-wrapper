@@ -5,6 +5,12 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [Unreleased]
 
+## [2.0.0] - ????
+
+### Changed
+
+* Replaced PythonKernel from org.knime.python to org.knime.python2 (#4)
+
 ## [1.1.0] - 2017-02-23
 
 ### Added
