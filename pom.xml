@@ -31,6 +31,7 @@
         <tycho.version>1.0.0</tycho.version>
         <tycho.extras.version>1.0.0</tycho.extras.version>
         <tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
+        <tycho.scmUrl>scm:git:https://github.com/3D-e-Chem/knime-python-wrapper.git</tycho.scmUrl>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
