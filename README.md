@@ -90,7 +90,7 @@ Steps to get development environment setup:
 4. Install m2e (Maven integration for Eclipse) + KNIME Python Integration
 
     1. Goto Window -> Preferences -> Install/Update -> Available Software Sites
-    2. Make sure the following Software Sites are present otherwise add them:
+    2. Make sure the following Software Sites (or a version of them) are present otherwise add them:
 
       * http://update.knime.org/analytics-platform/3.5
       * http://download.eclipse.org/eclipse/updates/4.6
@@ -101,8 +101,11 @@ Steps to get development environment setup:
     5. Goto Help > Install new software ...
     6. Select --All Available sites-- in work with pulldown
     7. Wait for list to be filled, `Pending...` should disappear
-    7. Select `m2e - Maven integration for Eclipse (includes Incubating components)`
-    8. Select `KNIME Python Integration`
+    8. Select the following items:
+
+      * m2e - Maven integration for Eclipse (includes Incubating components)
+      * KNIME Python Integration
+
     9. Install software & restart
 
 5. Import this repo as an Existing Maven project
