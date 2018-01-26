@@ -18,6 +18,8 @@ public class PythonWrapperTestUtils {
      * @throws IOException
      */
     public static File materializeKNIMEPythonUtils() throws MalformedURLException, IOException {
-        return Activator.getFile("org.knime.python2", "py");
+        File file = Activator.getFile("org.knime.python2", "py");
+        Activator.getFile("org.knime.python2.serde.flatbuffers", "py");
+        return file;
     }
 }
