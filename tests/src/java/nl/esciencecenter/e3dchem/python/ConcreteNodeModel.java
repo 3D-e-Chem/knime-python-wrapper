@@ -6,7 +6,7 @@ import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 
-public class ConcreteNodeModel extends PythonWrapperNodeModel<ConcreteNodeConfig> {
+public class ConcreteNodeModel extends PythonWrapperNodeModel<PythonWrapperNodeConfig> {
 	private Collection<FlowVariable> variables;
 
 	public ConcreteNodeModel(PortType[] inPortTypes, PortType[] outPortTypes) {
@@ -32,7 +32,7 @@ public class ConcreteNodeModel extends PythonWrapperNodeModel<ConcreteNodeConfig
 	}
 
 	@Override
-	protected ConcreteNodeConfig createConfig() {
-		return new ConcreteNodeConfig();
+	protected PythonWrapperNodeConfig createConfig() {
+		return new PythonWrapperNodeConfig();
 	}
 }

@@ -1,6 +1,7 @@
 package nl.esciencecenter.e3dchem.python;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.knime.python2.extensions.serializationlibrary.SentinelOption;
@@ -20,7 +21,7 @@ import org.knime.core.node.workflow.FlowVariable;
  * as `options` dict variable inside the Python script.
  *
  */
-public abstract class PythonWrapperNodeConfig {
+public class PythonWrapperNodeConfig {
 	public static final int DEFAULT_ROW_LIMIT = 1000;
 	private static final String CFG_ROW_LIMIT = "rowLimit";
 	private static final String CFG_PYTHON_VERSION_OPTION = "pythonVersionOption";
@@ -37,10 +38,18 @@ public abstract class PythonWrapperNodeConfig {
 	private int rowLimit = DEFAULT_ROW_LIMIT;
 	private PythonKernelOptions kernelOptions = new PythonKernelOptions();
 
+	/**
+	 * The variable names of the dataframes in the python workspace holding the input tables is set to `input_table`.
+	 * The variable names of the dataframes in the python workspace holding the output tables is set to `output_table`.
+	 */
 	public PythonWrapperNodeConfig() {
 		this(new String[] { "input_table" }, new String[] { "output_table" });
 	}
 
+	/**
+	 * @param inputTables the variable names of the dataframes in the python workspace holding the input tables
+	 * @param outputTables the variable names of the dataframes in the python workspace holding the output tables
+	 */
 	public PythonWrapperNodeConfig(String[] inputTables, String[] outputTables) {
 		this.variableNames = new VariableNames(flowVariables, inputTables, outputTables, null, null, null);
 	}
@@ -150,28 +159,51 @@ public abstract class PythonWrapperNodeConfig {
 		this.rowLimit = rowLimit;
 	}
 
-    /**
-     * Sets the internal {@link PythonKernelOptions} to a new object created using the specified parameters.
-     *
-     * @param versionOption the version options
-     * @param convertToPython convert missing values to sentinel on the way to python
-     * @param convertFromPython convert sentinel to missing values on the way from python to KNIME
-     * @param sentinelOption the sentinel option
-     * @param sentinelValue the sentinel value (only used if sentinelOption is CUSTOM)
-     * @param chunkSize the number of rows to transfer per chunk
-     */
-    public void setKernelOptions(final PythonVersionOption versionOption, final boolean convertToPython,
-        final boolean convertFromPython, final SentinelOption sentinelOption, final int sentinelValue, final int chunkSize) {
-        kernelOptions =
-                new PythonKernelOptions(versionOption, convertToPython, convertFromPython, sentinelOption, sentinelValue, chunkSize);
-    }
+	/**
+	 * Sets the internal {@link PythonKernelOptions} to a new object created
+	 * using the specified parameters.
+	 *
+	 * @param versionOption
+	 *            the version options
+	 * @param convertToPython
+	 *            convert missing values to sentinel on the way to python
+	 * @param convertFromPython
+	 *            convert sentinel to missing values on the way from python to
+	 *            KNIME
+	 * @param sentinelOption
+	 *            the sentinel option
+	 * @param sentinelValue
+	 *            the sentinel value (only used if sentinelOption is CUSTOM)
+	 * @param chunkSize
+	 *            the number of rows to transfer per chunk
+	 */
+	public void setKernelOptions(final PythonVersionOption versionOption, final boolean convertToPython,
+			final boolean convertFromPython, final SentinelOption sentinelOption, final int sentinelValue,
+			final int chunkSize) {
+		List<String> requiredModules = kernelOptions.getAdditionalRequiredModules();
+		kernelOptions = new PythonKernelOptions(versionOption, convertToPython, convertFromPython, sentinelOption,
+				sentinelValue, chunkSize);
+		for (String requiredModule : requiredModules) {
+			kernelOptions.addRequiredModule(requiredModule);
+		}
+	}
 
-    /**
-     * Gets the python kernel options.
-     *
-     * @return the python kernel options
-     */
-    public PythonKernelOptions getKernelOptions() {
-        return new PythonKernelOptions(kernelOptions);
-    }
+	/**
+	 * Gets the python kernel options.
+	 *
+	 * @return the python kernel options
+	 */
+	public PythonKernelOptions getKernelOptions() {
+		return new PythonKernelOptions(kernelOptions);
+	}
+
+	/**
+	 * Add an additional required module. A check for that module is performed
+	 * on node execution.
+	 *
+	 * @param name
+	 */
+	public void addRequiredModule(String name) {
+		kernelOptions.addRequiredModule(name);
+	}
 }

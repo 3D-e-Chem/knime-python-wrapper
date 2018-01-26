@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -23,8 +22,6 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 import org.knime.core.node.workflow.FlowVariable.Type;
-import org.knime.python2.PythonKernelTester;
-import org.knime.python2.PythonKernelTester.PythonKernelTestResult;
 import org.knime.python2.kernel.PythonKernel;
 
 /**
@@ -39,11 +36,6 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	 * Python script filename, relative to {@link NodeModel}
 	 */
 	protected String python_code_filename;
-	/**
-	 * Packages that the Python script depends on can be checked in the
-	 * {@link #configure()} method.
-	 */
-	protected List<String> required_python_packages = Arrays.asList();
 
 	public PythonWrapperNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
 		super(inPortTypes, outPortTypes);
@@ -55,7 +47,7 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 		return m_config;
 	}
 
-	protected BufferedDataTable[] execute(BufferedDataTable[] inData, ExecutionContext exec) throws Exception {
+	public BufferedDataTable[] execute(BufferedDataTable[] inData, ExecutionContext exec) throws Exception {
 		// Below has been copied from Knime Python node source code and
 		// adjusted.
 		PythonKernel kernel = new PythonKernel(getConfig().getKernelOptions());
@@ -78,7 +70,7 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 		}
 		// Make the options from the node dialog via the PythonWrapperNodeConfig
 		// instance available in the Python script
-		kernel.putFlowVariables(config.getOptionsName(), m_config.getOptionsValues());
+		kernel.putFlowVariables(config.getOptionsName(), config.getOptionsValues());
 		String[] output = kernel.execute(getPythonCode(), exec);
 		setExternalOutput(new LinkedList<String>(Arrays.asList(output[0].split("\n"))));
 		setExternalErrorOutput(new LinkedList<String>(Arrays.asList(output[1].split("\n"))));
@@ -199,28 +191,6 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 
 	@Override
 	protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-		validPython();
 		return getOutputSpecs(inSpecs);
-	}
-
-	/**
-	 * Checks if Python packages in {@link #required_python_packages
-	 * required_python_packages} field can be imported.
-	 *
-	 * @throws InvalidSettingsException
-	 */
-	public void validPython() throws InvalidSettingsException {
-		if (required_python_packages.isEmpty()) {
-			return; // Nothing to check
-		}
-		PythonKernelTestResult result;
-		if (getConfig().getKernelOptions().getUsePython3()) {
-			result = PythonKernelTester.testPython3Installation(required_python_packages, false);
-		} else {
-			result = PythonKernelTester.testPython2Installation(required_python_packages, false);
-		}
-		if (result.hasError()) {
-			throw new InvalidSettingsException(result.getErrorLog() + ", please install the Python library or correct Python executable");
-		}
 	}
 }

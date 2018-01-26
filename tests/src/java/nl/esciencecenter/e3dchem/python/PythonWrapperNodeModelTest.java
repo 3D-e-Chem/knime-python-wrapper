@@ -2,6 +2,7 @@ package nl.esciencecenter.e3dchem.python;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -13,20 +14,19 @@ import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
-import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModelWarningListener;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
@@ -36,72 +36,51 @@ public class PythonWrapperNodeModelTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	public class JsonNodeModel extends PythonWrapperNodeModel<ConcreteNodeConfig> {
+	@BeforeClass
+	public static void setUp() throws MalformedURLException, IOException {
+		PythonWrapperTestUtils.materializeKNIMEPythonUtils();
+	}
 
+	public class JsonNodeModel extends PythonWrapperNodeModel<PythonWrapperNodeConfig> {
 		public JsonNodeModel() {
 			super(new PortType[] { BufferedDataTable.TYPE }, new PortType[] { BufferedDataTable.TYPE });
 			python_code_filename = "json_test.py";
-			required_python_packages = Arrays.asList("json");
 		}
 
 		@Override
-		protected ConcreteNodeConfig createConfig() {
-			return new ConcreteNodeConfig();
+		protected PythonWrapperNodeConfig createConfig() {
+			PythonWrapperNodeConfig config = new PythonWrapperNodeConfig();
+			config.addRequiredModule("json");
+			return config;
 		}
-
 	}
 
-	public class FoobarNodeModel extends PythonWrapperNodeModel<ConcreteNodeConfig> {
+	public class FoobarNodeModel extends PythonWrapperNodeModel<PythonWrapperNodeConfig> {
 
 		public FoobarNodeModel() {
 			super(new PortType[] { BufferedDataTable.TYPE }, new PortType[] { BufferedDataTable.TYPE });
 			python_code_filename = "foobar_test.py";
-			required_python_packages = Arrays.asList("foobar");
 		}
 
 		@Override
-		protected ConcreteNodeConfig createConfig() {
-			return new ConcreteNodeConfig();
+		protected PythonWrapperNodeConfig createConfig() {
+			PythonWrapperNodeConfig config = new PythonWrapperNodeConfig();
+			config.addRequiredModule("foobar");
+			return config;
 		}
 
 	}
 
-	public class NoReqsNodeModel extends PythonWrapperNodeModel<ConcreteNodeConfig> {
-
+	public class NoReqsNodeModel extends PythonWrapperNodeModel<PythonWrapperNodeConfig> {
 		public NoReqsNodeModel() {
 			super(new PortType[] { BufferedDataTable.TYPE }, new PortType[] { BufferedDataTable.TYPE });
 			python_code_filename = "noreqs_test.py";
-			required_python_packages = new ArrayList<String>();
 		}
 
 		@Override
-		protected ConcreteNodeConfig createConfig() {
-			return new ConcreteNodeConfig();
+		protected PythonWrapperNodeConfig createConfig() {
+			return new PythonWrapperNodeConfig();
 		}
-
-	}
-
-	@Test
-	public void testValidPython_JsonPackage_PackageInstalled() throws InvalidSettingsException {
-		JsonNodeModel model = new JsonNodeModel();
-
-		model.validPython();
-	}
-
-	@Test
-	public void testValidPython_FoobarPackage_PackageMissing() throws InvalidSettingsException {
-		thrown.expect(InvalidSettingsException.class);
-		thrown.expectMessage("foobar");
-		FoobarNodeModel model = new FoobarNodeModel();
-
-		model.validPython();
-	}
-
-	@Test
-	public void testValidPython_NoPackageequired() throws InvalidSettingsException {
-		NoReqsNodeModel model = new NoReqsNodeModel();
-
-		model.validPython();
 	}
 
 	@Test
@@ -138,7 +117,6 @@ public class PythonWrapperNodeModelTest {
 
 		verify(kernel).putFlowVariables(eq("flow_variables"), any());
 		Set<FlowVariable> options = new HashSet<FlowVariable>();
-		options.add(new FlowVariable("column_name", "column1"));
 		verify(kernel).putFlowVariables(eq("options"), eq(options));
 		verify(kernel, times(1)).putDataTable(eq("input_table"), eq(inData[0]), eq(monitor));
 		verify(kernel).execute(anyString(), eq(exec));
@@ -147,6 +125,11 @@ public class PythonWrapperNodeModelTest {
 
 	@Test
 	public void testExecuteKernel__warningMessageSet() throws Exception {
+		// Mimic when in Python following line is present
+		// flow_variables['warning_message'] = "Some warning"
+		Collection<FlowVariable> variables = new HashSet<FlowVariable>();
+		variables.add(new FlowVariable("warning_message", "some warning"));
+
 		ConcreteNodeModel model = new ConcreteNodeModel();
 		BufferedDataTable[] inData = { mock(BufferedDataTable.class) };
 		ExecutionContext exec = mock(ExecutionContext.class);
@@ -155,8 +138,6 @@ public class PythonWrapperNodeModelTest {
 		when(kernel.execute(anyString(), eq(exec))).thenReturn(externalOutput);
 		ExecutionMonitor monitor = mock(ExecutionMonitor.class);
 		when(exec.createSubProgress(anyDouble())).thenReturn(monitor);
-		Collection<FlowVariable> variables = new HashSet<FlowVariable>();
-		variables.add(new FlowVariable("warning_message", "some warning"));
 		when(kernel.getFlowVariables(eq("flow_variables"))).thenReturn(variables);
 		NodeModelWarningListener listener = mock(NodeModelWarningListener.class);
 		model.addWarningListener(listener);
@@ -165,5 +146,19 @@ public class PythonWrapperNodeModelTest {
 
 		verify(listener, times(1)).warningChanged(eq("some warning"));
 		assertEquals(variables, model.getVariables());
+	}
+
+	@Test
+	public void testGetPythonCode() throws FileNotFoundException {
+		ConcreteNodeModel model = new ConcreteNodeModel();
+		String code = model.getPythonCode();
+
+		assertTrue(code.contains("input_table"));
+	}
+
+	@Test(expected = FileNotFoundException.class)
+	public void testGetPythonCode_missingFile() throws FileNotFoundException {
+		JsonNodeModel model = new JsonNodeModel();
+		model.getPythonCode();
 	}
 }
