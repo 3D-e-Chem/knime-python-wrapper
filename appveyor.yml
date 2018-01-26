@@ -1,7 +1,7 @@
 version: 1.0.{build}
 cache: C:\Users\appveyor\.m2
 install:
-- "set PATH=C:\Python36;%PATH%"
+- pip install pandas
 build_script:
 - cmd: mvn package -B
 test_script:

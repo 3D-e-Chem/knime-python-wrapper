@@ -16,7 +16,9 @@ cache:
   directories:
    - $HOME/.m2
    - $HOME/.sonar/cache
-install: mvn package -B
+install: 
+ - pip install pandas
+ - mvn package -B
 after_success:
  - mvn sonar:sonar -Dsonar.login=$SONAR_TOKEN
  

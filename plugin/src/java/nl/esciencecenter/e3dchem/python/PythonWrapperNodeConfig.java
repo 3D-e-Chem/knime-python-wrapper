@@ -21,19 +21,20 @@ import org.knime.core.node.workflow.FlowVariable;
  *
  */
 public abstract class PythonWrapperNodeConfig {
-	static final int DEFAULT_ROW_LIMIT = 1000;
-	protected final String pythonOptions = "options";
-	protected final String flowVariables = "flow_variables";
-	protected final String warningMessageFlowVariable = "warning_message";
-	protected final VariableNames variableNames;
+	public static final int DEFAULT_ROW_LIMIT = 1000;
 	private static final String CFG_ROW_LIMIT = "rowLimit";
-	private int rowLimit = DEFAULT_ROW_LIMIT;
 	private static final String CFG_PYTHON_VERSION_OPTION = "pythonVersionOption";
 	private static final String CFG_CONVERT_MISSING_TO_PYTHON = "convertMissingToPython";
 	private static final String CFG_CONVERT_MISSING_FROM_PYTHON = "convertMissingFromPython";
 	private static final String CFG_SENTINEL_OPTION = "sentinelOption";
 	private static final String CFG_SENTINEL_VALUE = "sentinelValue";
 	private static final String CFG_CHUNK_SIZE = "chunkSize";
+
+	protected final String pythonOptions = "options";
+	protected final String flowVariables = "flow_variables";
+	protected final String warningMessageFlowVariable = "warning_message";
+	protected final VariableNames variableNames;
+	private int rowLimit = DEFAULT_ROW_LIMIT;
 	private PythonKernelOptions kernelOptions = new PythonKernelOptions();
 
 	public PythonWrapperNodeConfig() {

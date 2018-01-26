@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -102,7 +103,7 @@ public class PythonWrapperNodeModelTest {
 	@Test
 	public void testValidPython_FoobarPackage_PackageMissing() throws InvalidSettingsException {
 		thrown.expect(InvalidSettingsException.class);
-		thrown.expectMessage("Missing 'foobar' Python package(s), please install or correct Python executable");
+		thrown.expectMessage("foobar");
 		FoobarNodeModel model = new FoobarNodeModel();
 
 		model.validPython();
@@ -117,9 +118,14 @@ public class PythonWrapperNodeModelTest {
 
 	@Test
 	public void testValidPython_Python3() throws InvalidSettingsException {
+		Assume.assumeFalse(isWindows());
 		NoReqsNodeModelPy3 model = new NoReqsNodeModelPy3();
 
 		model.validPython();
+	}
+
+	private boolean isWindows() {
+		return System.getProperty("os.name").contains("win");
 	}
 
 	@Test

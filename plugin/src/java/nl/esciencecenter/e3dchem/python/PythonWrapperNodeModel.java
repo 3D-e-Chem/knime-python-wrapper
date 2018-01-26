@@ -210,6 +210,9 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	 * @throws InvalidSettingsException
 	 */
 	public void validPython() throws InvalidSettingsException {
+		if (required_python_packages.isEmpty()) {
+			return; // Nothing to check
+		}
 		PythonKernelTestResult result;
 		if (getConfig().getKernelOptions().getUsePython3()) {
 			result = PythonKernelTester.testPython3Installation(required_python_packages, false);
@@ -217,10 +220,7 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 			result = PythonKernelTester.testPython2Installation(required_python_packages, false);
 		}
 		if (result.hasError()) {
-			String msg = "Missing ";
-			msg += required_python_packages.stream().map(p -> "'" + p + "'").collect(Collectors.joining(" or "));
-			msg += " Python package(s), please install or correct Python executable";
-			throw new InvalidSettingsException(msg, new InvalidSettingsException(result.getErrorLog()));
+			throw new InvalidSettingsException(result.getErrorLog() + ", please install the Python library or correct Python executable");
 		}
 	}
 }
