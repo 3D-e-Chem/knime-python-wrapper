@@ -23,6 +23,8 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 import org.knime.core.node.workflow.FlowVariable.Type;
+import org.knime.python2.PythonKernelTester;
+import org.knime.python2.PythonKernelTester.PythonKernelTestResult;
 import org.knime.python2.kernel.PythonKernel;
 
 /**
@@ -71,7 +73,8 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 		int nrInputTables = config.getVariableNames().getInputTables().length;
 		double inputProgressStep = 0.3 / nrInputTables;
 		for (int i = 0; i < nrInputTables; i++) {
-			kernel.putDataTable(config.getVariableNames().getInputTables()[i], inData[i], exec.createSubProgress(inputProgressStep));
+			kernel.putDataTable(config.getVariableNames().getInputTables()[i], inData[i],
+					exec.createSubProgress(inputProgressStep));
 		}
 		// Make the options from the node dialog via the PythonWrapperNodeConfig
 		// instance available in the Python script
@@ -207,26 +210,17 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	 * @throws InvalidSettingsException
 	 */
 	public void validPython() throws InvalidSettingsException {
-		if (required_python_packages.isEmpty()) {
-			return; // Nothing to check
-		}
-		String pythonCommand = org.knime.python2.Activator.getPython2Command();
+		PythonKernelTestResult result;
 		if (getConfig().getKernelOptions().getUsePython3()) {
-			pythonCommand = org.knime.python2.Activator.getPython3Command();
+			result = PythonKernelTester.testPython3Installation(required_python_packages, false);
+		} else {
+			result = PythonKernelTester.testPython2Installation(required_python_packages, false);
 		}
-		String program = required_python_packages.stream().map(p -> "import " + p).collect(Collectors.joining(";"));
-		ProcessBuilder pb = new ProcessBuilder(pythonCommand, "-c", program);
-		try {
-			Process process = pb.start();
-			int exitValue = process.waitFor();
-			if (exitValue != 0) {
-				String msg = "Missing ";
-				msg += required_python_packages.stream().map(p -> "'" + p + "'").collect(Collectors.joining(" or "));
-				msg += " Python package(s), please install or correct Python executable";
-				throw new InvalidSettingsException(msg);
-			}
-		} catch (IOException | InterruptedException e) {
-			throw new InvalidSettingsException("Failed to check required Python packages", e);
+		if (result.hasError()) {
+			String msg = "Missing ";
+			msg += required_python_packages.stream().map(p -> "'" + p + "'").collect(Collectors.joining(" or "));
+			msg += " Python package(s), please install or correct Python executable";
+			throw new InvalidSettingsException(msg, new InvalidSettingsException(result.getErrorLog()));
 		}
 	}
 }
