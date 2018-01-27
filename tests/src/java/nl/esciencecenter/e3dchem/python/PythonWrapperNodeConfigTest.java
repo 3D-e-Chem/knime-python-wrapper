@@ -65,7 +65,7 @@ public class PythonWrapperNodeConfigTest {
 
 		config.saveTo(settings);
 
-		assertEquals(1000, settings.getInt("rowLimit"));
+		assertEquals(500000, settings.getInt("chunkSize"));
 	}
 
 	@Test
