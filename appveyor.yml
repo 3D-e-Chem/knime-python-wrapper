@@ -1,7 +1,5 @@
 version: 1.0.{build}
 cache: C:\Users\appveyor\.m2
-install:
-- pip install pandas
 build_script:
 - cmd: mvn package -B
 test_script:
@@ -11,7 +9,6 @@ artifacts:
   name: Update site
 on_finish:
 - ps: >-
-    $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
     Get-ChildItem "tests/target/surefire-reports/" -Filter *.xml | Foreach-Object{
-        (New-Object 'System.Net.WebClient').UploadFile($url, $_.FullName)
+        (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", $_.FullName)
     }
