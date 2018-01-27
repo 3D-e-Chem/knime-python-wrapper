@@ -60,20 +60,6 @@ public class PythonWrapperNodeConfigTest {
 	}
 
 	@Test
-	public void testGetRowLimit() {
-		int result = config.getRowLimit();
-		int expected = PythonWrapperNodeConfig.DEFAULT_ROW_LIMIT;
-		assertEquals(expected, result);
-	}
-
-	@Test
-	public void testSetRowLimit() {
-		config.setRowLimit(42);
-
-		assertEquals(42, config.getRowLimit());
-	}
-
-	@Test
 	public void testSaveTo() throws InvalidSettingsException {
 		NodeSettings settings = new NodeSettings("python-wrapper");
 
@@ -85,21 +71,21 @@ public class PythonWrapperNodeConfigTest {
 	@Test
 	public void testLoadFrom() throws InvalidSettingsException {
 		NodeSettings settings = new NodeSettings("python-wrapper");
-		settings.addInt("rowLimit", 42);
+		settings.addInt("chunkSize", 42);
 
 		config.loadFrom(settings);
 
-		assertEquals(42, config.getRowLimit());
+		assertEquals(42, config.getKernelOptions().getChunkSize());
 	}
 
 	@Test
 	public void testLoadFromInDialog() throws InvalidSettingsException {
 		NodeSettings settings = new NodeSettings("python-wrapper");
-		settings.addInt("rowLimit", 42);
+		settings.addInt("chunkSize", 42);
 
 		config.loadFromInDialog(settings);
 
-		assertEquals(42, config.getRowLimit());
+		assertEquals(42, config.getKernelOptions().getChunkSize());
 	}
 
 	@Test

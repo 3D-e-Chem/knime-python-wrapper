@@ -22,8 +22,6 @@ import org.knime.core.node.workflow.FlowVariable;
  *
  */
 public class PythonWrapperNodeConfig {
-	public static final int DEFAULT_ROW_LIMIT = 1000;
-	private static final String CFG_ROW_LIMIT = "rowLimit";
 	private static final String CFG_PYTHON_VERSION_OPTION = "pythonVersionOption";
 	private static final String CFG_CONVERT_MISSING_TO_PYTHON = "convertMissingToPython";
 	private static final String CFG_CONVERT_MISSING_FROM_PYTHON = "convertMissingFromPython";
@@ -35,7 +33,6 @@ public class PythonWrapperNodeConfig {
 	protected final String flowVariables = "flow_variables";
 	protected final String warningMessageFlowVariable = "warning_message";
 	protected final VariableNames variableNames;
-	private int rowLimit = DEFAULT_ROW_LIMIT;
 	private PythonKernelOptions kernelOptions = new PythonKernelOptions();
 
 	/**
@@ -86,7 +83,6 @@ public class PythonWrapperNodeConfig {
 	 *            The settings to save to
 	 */
 	public void saveTo(final NodeSettingsWO settings) {
-		settings.addInt(CFG_ROW_LIMIT, rowLimit);
 		settings.addString(CFG_PYTHON_VERSION_OPTION, kernelOptions.getPythonVersionOption().name());
 		settings.addBoolean(CFG_CONVERT_MISSING_TO_PYTHON, kernelOptions.getConvertMissingToPython());
 		settings.addBoolean(CFG_CONVERT_MISSING_FROM_PYTHON, kernelOptions.getConvertMissingFromPython());
@@ -104,7 +100,6 @@ public class PythonWrapperNodeConfig {
 	 *             If the settings are invalid
 	 */
 	public void loadFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-		rowLimit = settings.getInt(CFG_ROW_LIMIT, DEFAULT_ROW_LIMIT);
 		kernelOptions.setPythonVersionOption(PythonVersionOption.valueOf(
 				settings.getString(CFG_PYTHON_VERSION_OPTION, kernelOptions.getPreferencePythonVersion().name())));
 		kernelOptions.setConvertMissingToPython(settings.getBoolean(CFG_CONVERT_MISSING_TO_PYTHON,
@@ -126,7 +121,6 @@ public class PythonWrapperNodeConfig {
 	 *            The settings to load from
 	 */
 	public void loadFromInDialog(final NodeSettingsRO settings) {
-		rowLimit = settings.getInt(CFG_ROW_LIMIT, DEFAULT_ROW_LIMIT);
 		kernelOptions.setPythonVersionOption(PythonVersionOption.valueOf(
 				settings.getString(CFG_PYTHON_VERSION_OPTION, kernelOptions.getPreferencePythonVersion().name())));
 		kernelOptions.setConvertMissingToPython(settings.getBoolean(CFG_CONVERT_MISSING_TO_PYTHON,
@@ -149,14 +143,6 @@ public class PythonWrapperNodeConfig {
 	public Set<FlowVariable> getOptionsValues() {
 		Set<FlowVariable> variables = new HashSet<FlowVariable>();
 		return variables;
-	}
-
-	public int getRowLimit() {
-		return rowLimit;
-	}
-
-	public void setRowLimit(int rowLimit) {
-		this.rowLimit = rowLimit;
 	}
 
 	/**

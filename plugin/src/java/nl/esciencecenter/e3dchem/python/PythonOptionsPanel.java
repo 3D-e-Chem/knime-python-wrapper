@@ -6,8 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -35,8 +33,6 @@ import org.knime.python2.kernel.PythonKernelOptions.PythonVersionOption;
  */
 public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends JPanel {
 	private static final long serialVersionUID = -1088132215218301785L;
-	private final JLabel m_rowLimitLabel = new JLabel("Row limit (dialog)");
-	private final Config config;
 	private ButtonGroup m_pythonVersion;
 	private JRadioButton m_python2;
 	private JRadioButton m_python3;
@@ -53,11 +49,7 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 	private JPanel m_versionPanel;
 	private final EnforcePythonVersion m_enforcedVersion;
 
-	private final JSpinner m_rowLimit = new JSpinner(
-			new SpinnerNumberModel(PythonWrapperNodeConfig.DEFAULT_ROW_LIMIT, 0, Integer.MAX_VALUE, 100));
-
-	public PythonOptionsPanel(final Config config, final EnforcePythonVersion version) {
-		this.config = config;
+	public PythonOptionsPanel(final EnforcePythonVersion version) {
 		setLayout(new GridBagLayout());
 		final GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(5, 5, 5, 5);
@@ -67,15 +59,6 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 		gbc.weighty = 0;
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		add(m_rowLimitLabel, gbc);
-		gbc.gridx++;
-		gbc.weightx = 1;
-		add(m_rowLimit, gbc);
-		gbc.gridx = 0;
-		gbc.gridy++;
-		gbc.gridwidth = 2;
-		gbc.weighty = Double.MIN_NORMAL;
-		add(new JLabel(), gbc);
 		m_enforcedVersion = version;
 		if (m_enforcedVersion != EnforcePythonVersion.NONE) {
 			m_versionPanel.setVisible(false);
@@ -85,9 +68,6 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 		m_python3 = new JRadioButton("Python 3");
 		m_pythonVersion.add(m_python2);
 		m_pythonVersion.add(m_python3);
-		final PythonKernelOptionsListener pkol = new PythonKernelOptionsListener();
-		m_python2.addActionListener(pkol);
-		m_python3.addActionListener(pkol);
 		final JPanel panel = new JPanel(new GridBagLayout());
 		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -105,20 +85,15 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 		final JPanel missingPanel = new JPanel(new GridLayout(0, 1));
 		missingPanel.setBorder(BorderFactory.createTitledBorder("Missing Values (Int, Long)"));
 		m_convertToPython = new JCheckBox("convert missing values to sentinel value (to python)");
-		m_convertToPython.addActionListener(pkol);
 		missingPanel.add(m_convertToPython);
 		m_convertFromPython = new JCheckBox("convert sentinel values to missing value (from python)");
-		m_convertFromPython.addActionListener(pkol);
 		missingPanel.add(m_convertFromPython);
 		final JPanel sentinelPanel = new JPanel(new FlowLayout());
 		final JLabel sentinelLabel = new JLabel("Sentinel value: ");
 		m_sentinelValueGroup = new ButtonGroup();
 		m_minVal = new JRadioButton("MIN_VAL");
-		m_minVal.addActionListener(pkol);
 		m_maxVal = new JRadioButton("MAX_VAL");
-		m_maxVal.addActionListener(pkol);
 		m_useInput = new JRadioButton("");
-		m_useInput.addActionListener(pkol);
 		m_sentinelValueGroup.add(m_minVal);
 		m_sentinelValueGroup.add(m_maxVal);
 		m_sentinelValueGroup.add(m_useInput);
@@ -166,10 +141,11 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 		gbc.gridx = 0;
 		gbc.gridy++;
 		panel.add(chunkingPanel, gbc);
+		add(panel);
 	}
 
-	public PythonOptionsPanel(final Config config) {
-		this(config, EnforcePythonVersion.NONE);
+	public PythonOptionsPanel() {
+		this(EnforcePythonVersion.NONE);
 	}
 
 	/**
@@ -179,7 +155,6 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 	 *            The config
 	 */
 	public void saveSettingsTo(final Config config) {
-		config.setRowLimit((int) m_rowLimit.getValue());
 		config.setKernelOptions(getSelectedPythonVersion(), m_convertToPython.isSelected(),
 				m_convertFromPython.isSelected(), getSelectedSentinelOption(), m_sentinelValue,
 				((Integer) m_chunkSize.getValue()).intValue());
@@ -192,7 +167,6 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 	 *            The config
 	 */
 	public void loadSettingsFrom(final Config config) {
-		m_rowLimit.setValue(config.getRowLimit());
 		final PythonKernelOptions kopts = config.getKernelOptions();
 		if (kopts.getPythonVersionOption() == PythonKernelOptions.PythonVersionOption.PYTHON3) {
 			m_python3.setSelected(true);
@@ -222,7 +196,6 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 		try {
 			m_sentinelValue = Integer.parseInt(m_sentinelInput.getText());
 			m_missingWarningLabel.setText("");
-			updateKernelOptions();
 		} catch (final NumberFormatException ex) {
 			m_sentinelValue = 0;
 			m_missingWarningLabel.setText(
@@ -266,26 +239,5 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 				return PythonKernelOptions.PythonVersionOption.PYTHON3;
 			}
 		}
-	}
-
-	/**
-	 * Internal ActionListener used for most components. On change the
-	 * {@link PythonKernelOptions} in the {@link PythonSourceCodePanel} are
-	 * updated.
-	 *
-	 */
-	private class PythonKernelOptionsListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(final ActionEvent e) {
-			updateKernelOptions();
-		}
-
-	}
-
-	public void updateKernelOptions() {
-		config.setKernelOptions(getSelectedPythonVersion(), m_convertToPython.isSelected(),
-				m_convertFromPython.isSelected(), getSelectedSentinelOption(), m_sentinelValue,
-				((Integer) m_chunkSize.getValue()).intValue());
 	}
 }
