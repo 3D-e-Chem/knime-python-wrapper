@@ -11,6 +11,10 @@ The file is formatted as described on http://keepachangelog.com/.
 
 * Replaced PythonKernel from org.knime.python to org.knime.python2 (#4)
 
+### Fixed
+
+* Give proper exception when Python file is missing (#1)
+
 ## [1.1.0] - 2017-02-23
 
 ### Added
