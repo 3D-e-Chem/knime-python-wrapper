@@ -20,12 +20,12 @@ Requirements:
 Instructions for KNIME node developers that want to call a Python script.
 Several steps must be performed:
 
-[1. Add update site](#1-add-update-site)
-[2. Add dependency](#2-add-dependency)
-[3. Implement node](#3-implement-node)
-[4. Write tests](#4-write-tests)
+1. [Add update site](#1-add-update-site)
+2. [Add dependency](#2-add-dependency)
+3. [Implement](#3-implement)
+4. [Write tests](#4-write-tests)
 
-## 1. Add update site
+## Add update site
 
 The releases of this repository are available in the `https://3d-e-chem.github.io/updates` update site.
 
@@ -40,14 +40,35 @@ To make use of in a Tycho based project add to the `<repositories>` tag of the `
 </repository>
 ```
 
-## 2. Add dependency
+## Add dependency
 
 To implement the node a dependency is needed for the plugin add tests.
 To do this add `nl.esciencecenter.e3dchem.knime.python` as a required plugin to the `plugin/META-INF/MANIFEST.MF` and `tests/META-INF/MANIFEST.MF` file.
 
-## 3. Implement node
+## Implement
+
+### Config
 
 Create your node config class extended from the `nl.esciencecenter.e3dchem.python.PythonWrapperNodeConfig` class.
+
+Overwrite the constructor to add required Python modules with the `addRequiredModule("<module name>")` method.
+
+PythonWrapperNodeConfig class are configured for a single input table called `input_table` and a single output table called `output_table`.
+To change the the number and names of input and/or output tables, override the constructor.
+
+### Dialog
+
+In your nodes dialog the Python options panel should be added by adding the following to the dialog constructor
+```java
+pythonOptions = new PythonOptionsPanel<PredictMetabolitesConfig>();
+addTab("Python options", pythonOptions);
+```
+
+To save the Python options to disk you must call the `pythonOptions.saveSettingsTo(config)` followed by `config.saveTo(settings)` in the `save*To()` method of the dialog.
+To load the Python options from disk you must call the `config.loadFrom(settings)` followed by `pythonOptions.loadSettingsFrom(config)` in the `load*From()` methods of the dialog.
+
+### Python script
+
 Inside Python script the following variables are special:
 
 * `options`, dictionary filled from Java with PythonWrapperNodeConfig.getOptionsValues() method, to read from
@@ -56,16 +77,17 @@ Inside Python script the following variables are special:
 * `flow_variables`, dictionary of flow variables, to get or put key/value pairs
   * `flow_variables['warning_message']`, if key exists then value will be set as warning message of node
 
+The Python script should be located in same directory as the model.
+
+### Model
+
 Create your node model class extended from the `nl.esciencecenter.e3dchem.python.PythonWrapperNodeModel` class.
-Overwrite the `python_code_filename` and `required_python_packages` fields in the constructor.
+Overwrite the `python_code_filename` fields in the constructor, this is the name of the Python script.
 
-PythonWrapperNodeConfig and PythonWrapperNodeModel class are setup for a single input table called `input_table` and a single output table called `output_table`.
-To change the the number and names of input and/or output tables, create sub-classes from them and override the constructor in both sub-classes.
+## Write tests
 
-## 4. Write tests
-
-To run tests which execute the node it is needed to setup `KNIME Python integration` plugin.
-This can be done by calling `PythonWrapperTestUtils.materializeKNIMEPythonUtils()` in `@BeforeClass` method of a test case.
+To run tests which execute the node a call to `PythonWrapperTestUtils.materializeKNIMEPythonUtils()` is required
+this will add the KNIME-Python utility scripts to the Python path.
 
 # Build
 
