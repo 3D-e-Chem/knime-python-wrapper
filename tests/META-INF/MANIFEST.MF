@@ -8,9 +8,8 @@ Require-Bundle: org.junit;bundle-version="4.12.0",
  org.knime.core;bundle-version="[3.1.0,4.0.0)",
  org.knime.base;bundle-version="[3.1.0,4.0.0)",
  org.knime.testing;bundle-version="[3.1.0,4.0.0)",
- org.knime.python2.serde.flatbuffers;bundle-version="[3.0.0,4.0.0)",
- nl.esciencecenter.e3dchem.python.plugin,
- org.knime.python2
+ org.knime.python2;bundle-version="[3.5.0,4.0.0)",
+ nl.esciencecenter.e3dchem.python.plugin
 Bundle-Vendor: Netherlands eScience Center
 Bundle-ClassPath: .,
  lib/mockito-core-2.7.11.jar,
