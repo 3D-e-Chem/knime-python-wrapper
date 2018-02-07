@@ -64,8 +64,8 @@ pythonOptions = new PythonOptionsPanel<PredictMetabolitesConfig>();
 addTab("Python options", pythonOptions);
 ```
 
-To save the Python options to disk you must call the `pythonOptions.saveSettingsTo(config)` followed by `config.saveTo(settings)` in the `save*To()` method of the dialog.
-To load the Python options from disk you must call the `config.loadFrom(settings)` followed by `pythonOptions.loadSettingsFrom(config)` in the `load*From()` methods of the dialog.
+To save the Python options to disk you must call the `pythonOptions.saveSettingsTo(config)` followed by `config.saveToInDialog(settings)` in the `save*To()` method of the dialog.
+To load the Python options from disk you must call the `config.loadFromInDialog(settings)` followed by `pythonOptions.loadSettingsFrom(config)` in the `load*From()` methods of the dialog.
 
 ### Python script
 

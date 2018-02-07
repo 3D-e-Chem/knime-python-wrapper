@@ -83,6 +83,16 @@ public class PythonWrapperNodeConfig {
 	 *            The settings to save to
 	 */
 	public void saveTo(final NodeSettingsWO settings) {
+		saveToInDialog(settings);
+	}
+
+	/**
+	 * Save configuration to the given node settings.
+	 * 
+	 * @param settings
+	 *            The settings to save to
+	 */
+	public void saveToInDialog(NodeSettingsWO settings) {
 		settings.addString(CFG_PYTHON_VERSION_OPTION, kernelOptions.getPythonVersionOption().name());
 		settings.addBoolean(CFG_CONVERT_MISSING_TO_PYTHON, kernelOptions.getConvertMissingToPython());
 		settings.addBoolean(CFG_CONVERT_MISSING_FROM_PYTHON, kernelOptions.getConvertMissingFromPython());
@@ -90,7 +100,7 @@ public class PythonWrapperNodeConfig {
 		settings.addInt(CFG_SENTINEL_VALUE, kernelOptions.getSentinelValue());
 		settings.addInt(CFG_CHUNK_SIZE, kernelOptions.getChunkSize());
 	}
-
+	
 	/**
 	 * Load configuration from the given node settings.
 	 *
@@ -100,17 +110,7 @@ public class PythonWrapperNodeConfig {
 	 *             If the settings are invalid
 	 */
 	public void loadFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-		kernelOptions.setPythonVersionOption(PythonVersionOption.valueOf(
-				settings.getString(CFG_PYTHON_VERSION_OPTION, kernelOptions.getPreferencePythonVersion().name())));
-		kernelOptions.setConvertMissingToPython(settings.getBoolean(CFG_CONVERT_MISSING_TO_PYTHON,
-				SerializationOptions.DEFAULT_CONVERT_MISSING_TO_PYTHON));
-		kernelOptions.setConvertMissingFromPython(settings.getBoolean(CFG_CONVERT_MISSING_FROM_PYTHON,
-				SerializationOptions.DEFAULT_CONVERT_MISSING_FROM_PYTHON));
-		kernelOptions.setSentinelOption(SentinelOption
-				.valueOf(settings.getString(CFG_SENTINEL_OPTION, SerializationOptions.DEFAULT_SENTINEL_OPTION.name())));
-		kernelOptions
-				.setSentinelValue(settings.getInt(CFG_SENTINEL_VALUE, SerializationOptions.DEFAULT_SENTINEL_VALUE));
-		kernelOptions.setChunkSize(settings.getInt(CFG_CHUNK_SIZE, PythonKernelOptions.DEFAULT_CHUNK_SIZE));
+		loadFromInDialog(settings);
 	}
 
 	/**
