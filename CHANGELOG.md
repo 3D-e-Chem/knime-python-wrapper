@@ -5,7 +5,7 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [Unreleased]
 
-## [2.0.0] - ????
+## [2.0.1] - 2018-02-07
 
 ### Changed
 
