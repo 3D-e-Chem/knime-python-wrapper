@@ -22,6 +22,8 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 import org.knime.core.node.workflow.FlowVariable.Type;
+import org.knime.python2.kernel.PythonCancelable;
+import org.knime.python2.kernel.PythonExecutionMonitorCancelable;
 import org.knime.python2.kernel.PythonKernel;
 
 /**
@@ -71,7 +73,7 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 		// Make the options from the node dialog via the PythonWrapperNodeConfig
 		// instance available in the Python script
 		kernel.putFlowVariables(config.getOptionsName(), config.getOptionsValues());
-		String[] output = kernel.execute(getPythonCode(), exec);
+		String[] output = kernel.execute(getPythonCode(), new PythonExecutionMonitorCancelable(exec));
 		setExternalOutput(new LinkedList<String>(Arrays.asList(output[0].split("\n"))));
 		setExternalErrorOutput(new LinkedList<String>(Arrays.asList(output[1].split("\n"))));
 		exec.createSubProgress(0.4).setProgress(1);

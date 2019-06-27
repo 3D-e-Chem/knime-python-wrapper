@@ -30,6 +30,8 @@ import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.NodeModelWarningListener;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
+import org.knime.python2.kernel.PythonCancelable;
+import org.knime.python2.kernel.PythonExecutionMonitorCancelable;
 import org.knime.python2.kernel.PythonKernel;
 
 public class PythonWrapperNodeModelTest {
@@ -109,7 +111,7 @@ public class PythonWrapperNodeModelTest {
 		ExecutionContext exec = mock(ExecutionContext.class);
 		PythonKernel kernel = mock(PythonKernel.class);
 		String[] externalOutput = { "stdout", "stderr" };
-		when(kernel.execute(anyString(), eq(exec))).thenReturn(externalOutput);
+		when(kernel.execute(anyString(), any(PythonExecutionMonitorCancelable.class))).thenReturn(externalOutput);
 		ExecutionMonitor monitor = mock(ExecutionMonitor.class);
 		when(exec.createSubProgress(anyDouble())).thenReturn(monitor);
 
@@ -119,7 +121,7 @@ public class PythonWrapperNodeModelTest {
 		Set<FlowVariable> options = new HashSet<FlowVariable>();
 		verify(kernel).putFlowVariables(eq("options"), eq(options));
 		verify(kernel, times(1)).putDataTable(eq("input_table"), eq(inData[0]), eq(monitor));
-		verify(kernel).execute(anyString(), eq(exec));
+		verify(kernel).execute(anyString(), any(PythonExecutionMonitorCancelable.class));
 		verify(kernel, times(1)).getDataTable(eq("output_table"), eq(exec), eq(monitor));
 	}
 
@@ -135,7 +137,7 @@ public class PythonWrapperNodeModelTest {
 		ExecutionContext exec = mock(ExecutionContext.class);
 		PythonKernel kernel = mock(PythonKernel.class);
 		String[] externalOutput = { "stdout", "stderr" };
-		when(kernel.execute(anyString(), eq(exec))).thenReturn(externalOutput);
+		when(kernel.execute(anyString(), any(PythonExecutionMonitorCancelable.class))).thenReturn(externalOutput);
 		ExecutionMonitor monitor = mock(ExecutionMonitor.class);
 		when(exec.createSubProgress(anyDouble())).thenReturn(monitor);
 		when(kernel.getFlowVariables(eq("flow_variables"))).thenReturn(variables);
