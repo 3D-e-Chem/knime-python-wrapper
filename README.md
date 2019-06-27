@@ -5,7 +5,7 @@ Used for development of KNIME nodes calling Python scripts.
 [![Build status](https://ci.appveyor.com/api/projects/status/y7u4n23sjo25pyg8/branch/master?svg=true)](https://ci.appveyor.com/project/3D-e-Chem/knime-python-wrapper/branch/master)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python&metric=alert_status)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python&metric=coverage)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.321904.svg)](https://doi.org/10.5281/zenodo.321904)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.97238.svg)](https://doi.org/10.5281/zenodo.97238)
 
 The nodes in Scripting>Python folder of the node repository (nodes part of the `KNIME Python integration` plugin) the end-user needs to paste Python code in a text area in the node dialog.
 Nodes derived from this repo will have a Python script included in their jar file and the dialog of the node will contain no source code text area.
