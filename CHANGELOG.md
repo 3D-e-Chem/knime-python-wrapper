@@ -7,6 +7,8 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [2.0.2] - 2019-06-27
 
+### Changed
+
 - Compatible with KNIME 4 (#6)[https://github.com/3D-e-Chem/knime-python-wrapper/issues/6]
 
 ## [2.0.1] - 2018-02-07
