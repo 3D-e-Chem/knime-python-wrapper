@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -13,6 +12,7 @@ import org.junit.Test;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettings;
 import org.knime.core.node.workflow.FlowVariable;
+import org.knime.python2.PythonModuleSpec;
 import org.knime.python2.kernel.PythonKernelOptions;
 
 public class PythonWrapperNodeConfigTest {
@@ -75,7 +75,7 @@ public class PythonWrapperNodeConfigTest {
 
 		config.loadFrom(settings);
 
-		assertEquals(42, config.getKernelOptions().getChunkSize());
+		assertEquals(42, config.getChunkSize());
 	}
 
 	@Test
@@ -85,7 +85,7 @@ public class PythonWrapperNodeConfigTest {
 
 		config.loadFromInDialog(settings);
 
-		assertEquals(42, config.getKernelOptions().getChunkSize());
+		assertEquals(42, config.getChunkSize());
 	}
 
 	@Test
@@ -93,9 +93,8 @@ public class PythonWrapperNodeConfigTest {
 		config.addRequiredModule("json");
 
 		PythonKernelOptions kernelOptions = config.getKernelOptions();
-		List<String> additionalRequiredModules = kernelOptions.getAdditionalRequiredModules();
-
-		List<String> expected = Collections.singletonList("json");
+		Set<PythonModuleSpec> additionalRequiredModules = kernelOptions.getAdditionalRequiredModules();
+		Set<PythonModuleSpec> expected = Collections.singleton(new PythonModuleSpec("json"));
 		assertEquals(expected, additionalRequiredModules);
 	}
 }

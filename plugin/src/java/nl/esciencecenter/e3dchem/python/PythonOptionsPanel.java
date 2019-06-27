@@ -19,10 +19,11 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.knime.python2.PythonCommand;
+import org.knime.python2.PythonVersion;
 import org.knime.python2.config.PythonSourceCodeOptionsPanel.EnforcePythonVersion;
 import org.knime.python2.extensions.serializationlibrary.SentinelOption;
-import org.knime.python2.kernel.PythonKernelOptions;
-import org.knime.python2.kernel.PythonKernelOptions.PythonVersionOption;
+import org.knime.python2.extensions.serializationlibrary.SerializationOptions;
 
 /**
  * Panel containing Python options
@@ -33,23 +34,42 @@ import org.knime.python2.kernel.PythonKernelOptions.PythonVersionOption;
  */
 public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends JPanel {
 	private static final long serialVersionUID = -1088132215218301785L;
-	private ButtonGroup m_pythonVersion;
-	private JRadioButton m_python2;
-	private JRadioButton m_python3;
-	private JCheckBox m_convertToPython;
-	private JCheckBox m_convertFromPython;
-	private ButtonGroup m_sentinelValueGroup;
-	private JRadioButton m_minVal;
-	private JRadioButton m_maxVal;
-	private JRadioButton m_useInput;
-	private JTextField m_sentinelInput;
-	private JLabel m_missingWarningLabel;
-	private int m_sentinelValue;
-	private JSpinner m_chunkSize;
-	private JPanel m_versionPanel;
-	private final EnforcePythonVersion m_enforcedVersion;
+    private final EnforcePythonVersion m_enforcedVersion;
+
+    private JPanel m_versionPanel;
+
+    private JRadioButton m_python2;
+
+    private JRadioButton m_python3;
+
+    private JCheckBox m_convertToPython;
+
+    private JCheckBox m_convertFromPython;
+
+    private JRadioButton m_minVal;
+
+    private JRadioButton m_maxVal;
+
+    private JRadioButton m_sentinelOptionUserInput;
+
+    private JTextField m_sentinelInput;
+
+    private JLabel m_missingWarningLabel;
+
+    private int m_sentinelValue;
+
+    private JSpinner m_chunkSize;
+
+    private PythonCommand m_python2Command;
+
+    private PythonCommand m_python3Command;
 
 	public PythonOptionsPanel(final EnforcePythonVersion version) {
+        final ButtonGroup pythonVersion = new ButtonGroup();
+        m_python2 = new JRadioButton("Python 2");
+        m_python3 = new JRadioButton("Python 3");
+        pythonVersion.add(m_python2);
+        pythonVersion.add(m_python3);
 		setLayout(new GridBagLayout());
 		final GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(5, 5, 5, 5);
@@ -63,11 +83,6 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 		if (m_enforcedVersion != EnforcePythonVersion.NONE) {
 			m_versionPanel.setVisible(false);
 		}
-		m_pythonVersion = new ButtonGroup();
-		m_python2 = new JRadioButton("Python 2");
-		m_python3 = new JRadioButton("Python 3");
-		m_pythonVersion.add(m_python2);
-		m_pythonVersion.add(m_python3);
 		final JPanel panel = new JPanel(new GridBagLayout());
 		gbc.insets = new Insets(5, 5, 5, 5);
 		gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -77,70 +92,69 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		m_versionPanel = new JPanel(new FlowLayout());
-		m_versionPanel.setBorder(BorderFactory.createTitledBorder("Use Python Version"));
-		m_versionPanel.add(m_python2);
-		m_versionPanel.add(m_python3);
-		panel.add(m_versionPanel, gbc);
-		// Missing value handling for Int and Long
-		final JPanel missingPanel = new JPanel(new GridLayout(0, 1));
-		missingPanel.setBorder(BorderFactory.createTitledBorder("Missing Values (Int, Long)"));
-		m_convertToPython = new JCheckBox("convert missing values to sentinel value (to python)");
-		missingPanel.add(m_convertToPython);
-		m_convertFromPython = new JCheckBox("convert sentinel values to missing value (from python)");
-		missingPanel.add(m_convertFromPython);
-		final JPanel sentinelPanel = new JPanel(new FlowLayout());
-		final JLabel sentinelLabel = new JLabel("Sentinel value: ");
-		m_sentinelValueGroup = new ButtonGroup();
-		m_minVal = new JRadioButton("MIN_VAL");
-		m_maxVal = new JRadioButton("MAX_VAL");
-		m_useInput = new JRadioButton("");
-		m_sentinelValueGroup.add(m_minVal);
-		m_sentinelValueGroup.add(m_maxVal);
-		m_sentinelValueGroup.add(m_useInput);
-		m_minVal.setSelected(true);
-		// TODO enable only if radio button is enabled
-		m_sentinelValue = 0;
-		m_sentinelInput = new JTextField("0");
-		m_sentinelInput.setPreferredSize(new Dimension(70, m_sentinelInput.getPreferredSize().height));
-		m_sentinelInput.getDocument().addDocumentListener(new DocumentListener() {
+        m_versionPanel.setBorder(BorderFactory.createTitledBorder("Use Python Version"));
+        m_versionPanel.add(m_python2);
+        m_versionPanel.add(m_python3);
+        panel.add(m_versionPanel, gbc);
+        // Missing value handling for int and long.
+        final JPanel missingPanel = new JPanel(new GridLayout(0, 1));
+        missingPanel.setBorder(BorderFactory.createTitledBorder("Missing Values (Int, Long)"));
+        m_convertToPython = new JCheckBox("convert missing values to sentinel value (to python)");
+        missingPanel.add(m_convertToPython);
+        m_convertFromPython = new JCheckBox("convert sentinel values to missing value (from python)");
+        missingPanel.add(m_convertFromPython);
+        final JPanel sentinelPanel = new JPanel(new FlowLayout());
+        final JLabel sentinelLabel = new JLabel("Sentinel value: ");
+        final ButtonGroup sentinelValueGroup = new ButtonGroup();
+        m_minVal = new JRadioButton("MIN_VAL");
+        m_maxVal = new JRadioButton("MAX_VAL");
+        m_sentinelOptionUserInput = new JRadioButton("");
+        sentinelValueGroup.add(m_minVal);
+        sentinelValueGroup.add(m_maxVal);
+        sentinelValueGroup.add(m_sentinelOptionUserInput);
+        m_minVal.setSelected(true);
+        // TODO: Enable only if radio button is enabled.
+        m_sentinelValue = 0;
+        m_sentinelInput = new JTextField("0");
+        m_sentinelInput.setPreferredSize(new Dimension(70, m_sentinelInput.getPreferredSize().height));
+        m_sentinelInput.getDocument().addDocumentListener(new DocumentListener() {
 
-			@Override
-			public void removeUpdate(final DocumentEvent e) {
-				updateSentinelValue();
-			}
+            @Override
+            public void removeUpdate(final DocumentEvent e) {
+                updateSentinelValue();
+            }
 
-			@Override
-			public void insertUpdate(final DocumentEvent e) {
-				updateSentinelValue();
-			}
+            @Override
+            public void insertUpdate(final DocumentEvent e) {
+                removeUpdate(e);
+            }
 
-			@Override
-			public void changedUpdate(final DocumentEvent e) {
-				// does not get fired
-			}
-		});
-		sentinelPanel.add(sentinelLabel);
-		sentinelPanel.add(m_minVal);
-		sentinelPanel.add(m_maxVal);
-		sentinelPanel.add(m_useInput);
-		sentinelPanel.add(m_sentinelInput);
-		missingPanel.add(sentinelPanel);
-		m_missingWarningLabel = new JLabel("");
-		missingPanel.add(m_missingWarningLabel);
-		gbc.gridx = 0;
-		gbc.gridy++;
-		panel.add(missingPanel, gbc);
-
-		// Give user some control over the number of rows to transfer per chunk
-		final JPanel chunkingPanel = new JPanel(new FlowLayout());
-		chunkingPanel.setBorder(BorderFactory.createTitledBorder("Chunking"));
-		chunkingPanel.add(new JLabel("Rows per chunk: "));
-		m_chunkSize = new JSpinner(
-				new SpinnerNumberModel(PythonKernelOptions.DEFAULT_CHUNK_SIZE, 1, Integer.MAX_VALUE, 1));
-		chunkingPanel.add(m_chunkSize);
-		gbc.gridx = 0;
-		gbc.gridy++;
-		panel.add(chunkingPanel, gbc);
+            @Override
+            public void changedUpdate(final DocumentEvent e) {
+                // Does not get fired.
+            }
+        });
+        sentinelPanel.add(sentinelLabel);
+        sentinelPanel.add(m_minVal);
+        sentinelPanel.add(m_maxVal);
+        sentinelPanel.add(m_sentinelOptionUserInput);
+        sentinelPanel.add(m_sentinelInput);
+        missingPanel.add(sentinelPanel);
+        m_missingWarningLabel = new JLabel("");
+        missingPanel.add(m_missingWarningLabel);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(missingPanel, gbc);
+        // Give user control over the number of rows to transfer per chunk.
+        final JPanel chunkingPanel = new JPanel(new FlowLayout());
+        chunkingPanel.setBorder(BorderFactory.createTitledBorder("Chunking"));
+        chunkingPanel.add(new JLabel("Rows per chunk: "));
+        m_chunkSize =
+            new JSpinner(new SpinnerNumberModel(SerializationOptions.DEFAULT_CHUNK_SIZE, 1, Integer.MAX_VALUE, 1));
+        chunkingPanel.add(m_chunkSize);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panel.add(chunkingPanel, gbc);
 		add(panel);
 	}
 
@@ -155,9 +169,14 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 	 *            The config
 	 */
 	public void saveSettingsTo(final Config config) {
-		config.setKernelOptions(getSelectedPythonVersion(), m_convertToPython.isSelected(),
-				m_convertFromPython.isSelected(), getSelectedSentinelOption(), m_sentinelValue,
-				((Integer) m_chunkSize.getValue()).intValue());
+        config.setPythonVersion(getSelectedPythonVersion());
+        config.setConvertMissingToPython(m_convertToPython.isSelected());
+        config.setConvertMissingFromPython(m_convertFromPython.isSelected());
+        config.setSentinelOption(getSelectedSentinelOption());
+        config.setSentinelValue(m_sentinelValue);
+        config.setChunkSize(((Integer)m_chunkSize.getValue()).intValue());
+        config.setPython2Command(m_python2Command);
+        config.setPython3Command(m_python3Command);
 	}
 
 	/**
@@ -167,25 +186,26 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 	 *            The config
 	 */
 	public void loadSettingsFrom(final Config config) {
-		final PythonKernelOptions kopts = config.getKernelOptions();
-		if (kopts.getPythonVersionOption() == PythonKernelOptions.PythonVersionOption.PYTHON3) {
-			m_python3.setSelected(true);
-		} else {
-			m_python2.setSelected(true);
-		}
-		// Missing value handling
-		m_convertToPython.setSelected(kopts.getConvertMissingToPython());
-		m_convertFromPython.setSelected(kopts.getConvertMissingFromPython());
-		if (kopts.getSentinelOption() == SentinelOption.MIN_VAL) {
-			m_minVal.setSelected(true);
-		} else if (kopts.getSentinelOption() == SentinelOption.MAX_VAL) {
-			m_maxVal.setSelected(true);
-		} else {
-			m_useInput.setSelected(true);
-		}
-		m_sentinelInput.setText(kopts.getSentinelValue() + "");
-		m_sentinelValue = kopts.getSentinelValue();
-		m_chunkSize.setValue(kopts.getChunkSize());
+        if (config.getPythonVersion() == PythonVersion.PYTHON3) {
+            m_python3.setSelected(true);
+        } else {
+            m_python2.setSelected(true);
+        }
+        // Missing value handling.
+        m_convertToPython.setSelected(config.getConvertMissingToPython());
+        m_convertFromPython.setSelected(config.getConvertMissingFromPython());
+        if (config.getSentinelOption() == SentinelOption.MIN_VAL) {
+            m_minVal.setSelected(true);
+        } else if (config.getSentinelOption() == SentinelOption.MAX_VAL) {
+            m_maxVal.setSelected(true);
+        } else {
+            m_sentinelOptionUserInput.setSelected(true);
+        }
+        m_sentinelInput.setText(config.getSentinelValue() + "");
+        m_sentinelValue = config.getSentinelValue();
+        m_chunkSize.setValue(config.getChunkSize());
+        m_python2Command = config.getPython2Command();
+        m_python3Command = config.getPython3Command();
 	}
 
 	/**
@@ -210,34 +230,34 @@ public class PythonOptionsPanel<Config extends PythonWrapperNodeConfig> extends 
 
 	private SentinelOption getSelectedSentinelOption() {
 		SentinelOption so = SentinelOption.MIN_VAL;
-		if (m_minVal.isSelected()) {
-			so = SentinelOption.MIN_VAL;
-		} else if (m_maxVal.isSelected()) {
-			so = SentinelOption.MAX_VAL;
-		} else if (m_useInput.isSelected()) {
-			so = SentinelOption.CUSTOM;
-		}
-		return so;
+        if (m_minVal.isSelected()) {
+            so = SentinelOption.MIN_VAL;
+        } else if (m_maxVal.isSelected()) {
+            so = SentinelOption.MAX_VAL;
+        } else if (m_sentinelOptionUserInput.isSelected()) {
+            so = SentinelOption.CUSTOM;
+        }
+        return so;
 	}
 
 	/**
 	 * Get the python version to use based on the EnforePythonVersion option or
 	 * the user selection.
 	 * 
-	 * @return the {@link PythonVersionOption} associated with the current
+	 * @return the {@link PythonVersion} associated with the current
 	 *         EnforePythonVersion or radio button selection
 	 */
-	private PythonKernelOptions.PythonVersionOption getSelectedPythonVersion() {
+	private PythonVersion getSelectedPythonVersion() {
 		if (m_enforcedVersion == EnforcePythonVersion.PYTHON2) {
-			return PythonKernelOptions.PythonVersionOption.PYTHON2;
-		} else if (m_enforcedVersion == EnforcePythonVersion.PYTHON3) {
-			return PythonKernelOptions.PythonVersionOption.PYTHON3;
-		} else {
-			if (m_python2.isSelected()) {
-				return PythonKernelOptions.PythonVersionOption.PYTHON2;
-			} else {
-				return PythonKernelOptions.PythonVersionOption.PYTHON3;
-			}
-		}
+            return PythonVersion.PYTHON2;
+        } else if (m_enforcedVersion == EnforcePythonVersion.PYTHON3) {
+            return PythonVersion.PYTHON3;
+        } else {
+            if (m_python2.isSelected()) {
+                return PythonVersion.PYTHON2;
+            } else {
+                return PythonVersion.PYTHON3;
+            }
+        }
 	}
 }

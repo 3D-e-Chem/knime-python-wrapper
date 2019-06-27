@@ -1,7 +1,5 @@
 package nl.esciencecenter.e3dchem.python;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
 
 public class PythonOptionsPanelTest {

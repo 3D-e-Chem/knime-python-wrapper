@@ -5,6 +5,10 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [Unreleased]
 
+## [2.0.2] - 2019-06-27
+
+- Compatible with KNIME 4 (#6)[https://github.com/3D-e-Chem/knime-python-wrapper/issues/6]
+
 ## [2.0.1] - 2018-02-07
 
 ### Changed
