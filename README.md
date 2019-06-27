@@ -3,8 +3,8 @@ Used for development of KNIME nodes calling Python scripts.
 
 [![Build Status](https://travis-ci.org/3D-e-Chem/knime-python-wrapper.svg?branch=master)](https://travis-ci.org/3D-e-Chem/knime-python-wrapper)
 [![Build status](https://ci.appveyor.com/api/projects/status/y7u4n23sjo25pyg8/branch/master?svg=true)](https://ci.appveyor.com/project/3D-e-Chem/knime-python-wrapper/branch/master)
-[![SonarCloud Gate](https://sonarcloud.io/api/badges/gate?key=nl.esciencecenter.e3dchem.python:nl.esciencecenter.e3dchem.python)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.e3dchem.python:nl.esciencecenter.e3dchem.python)
-[![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=nl.esciencecenter.e3dchem.python:nl.esciencecenter.e3dchem.python&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=nl.esciencecenter.e3dchem.python:nl.esciencecenter.e3dchem.python)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python&metric=alert_status)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python&metric=coverage)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.321904.svg)](https://doi.org/10.5281/zenodo.321904)
 
 The nodes in Scripting>Python folder of the node repository (nodes part of the `KNIME Python integration` plugin) the end-user needs to paste Python code in a text area in the node dialog.
@@ -102,37 +102,15 @@ The update site can be used to perform a local installation.
 
 # Development
 
-Development of code in this repository.
+Steps to get development environment setup based on https://github.com/knime/knime-sdk-setup#sdk-setup:
 
-Steps to get development environment setup:
+1. Install Java 8
+2. Install Eclipse for [RCP and RAP developers](https://www.eclipse.org/downloads/packages/release/2018-12/r/eclipse-ide-rcp-and-rap-developers)
+3. Configure Java 8 inside Eclipse Window > Preferences > Java > Installed JREs
+4. Import this repo as an Existing Maven project
+5. Activate target platform by going to Window > Preferences > Plug-in Development > Target Platform and check the `KNIME Analytics Platform (4.0) - nl.esciencecenter.e3dchem.knime.molviewer.targetplatform/KNIME-AP-4.0.target` target definition.
 
-1. Download KNIME SDK from https://www.knime.org/downloads/overview
-2. Install/Extract/start KNIME SDK
-3. Start SDK
-4. Install m2e (Maven integration for Eclipse) + KNIME Python Integration
-
-    1. Goto Window -> Preferences -> Install/Update -> Available Software Sites
-    2. Make sure the following Software Sites (or a version of them) are present otherwise add them:
-
-      * http://update.knime.org/analytics-platform/3.5
-      * http://download.eclipse.org/eclipse/updates/4.6
-      * http://download.eclipse.org/releases/neon
-
-    3. Goto Help -> Check for updates
-    4. Install any updates found & restart
-    5. Goto Help > Install new software ...
-    6. Select --All Available sites-- in work with pulldown
-    7. Wait for list to be filled, `Pending...` should disappear
-    8. Select the following items:
-
-      * m2e - Maven integration for Eclipse (includes Incubating components)
-      * KNIME Python Integration
-
-    9. Install software & restart
-
-5. Import this repo as an Existing Maven project
-
-After the import the Maven plugin connections must be setup, a Discover m2e connections dialog will popup to install all requested connectors, after the installation restart eclipse.
+During import the Tycho Eclipse providers must be installed.
 
 # New release
 
