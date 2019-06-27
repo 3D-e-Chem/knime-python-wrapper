@@ -30,7 +30,6 @@ import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.NodeModelWarningListener;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
-import org.knime.python2.kernel.PythonCancelable;
 import org.knime.python2.kernel.PythonExecutionMonitorCancelable;
 import org.knime.python2.kernel.PythonKernel;
 
