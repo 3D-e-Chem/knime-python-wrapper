@@ -86,8 +86,8 @@ Overwrite the `python_code_filename` fields in the constructor, this is the name
 
 ## Write tests
 
-To run tests which execute the node a call to `PythonWrapperTestUtils.materializeKNIMEPythonUtils()` is required
-this will add the KNIME-Python utility scripts to the Python path.
+To run tests which execute the node a call to `PythonWrapperTestUtils.init()` is required
+this will add the KNIME-Python utility scripts to the Python path and configure it to use the `python3` executable in current PATH.
 
 # Build
 

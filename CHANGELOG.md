@@ -5,6 +5,14 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [Unreleased]
 
+### Changed
+
+- In tests call `PythonWrapperTestUtils.init()` instead of `PythonWrapperTestUtils.materializeKNIMEPythonUtils()`.
+
+### Fixed
+
+- Force usage of python3 in PATH during tests ((#8)[https://github.com/3D-e-Chem/knime-python-wrapper/issues/8])
+
 ## [2.0.2] - 2019-06-27
 
 ### Changed
