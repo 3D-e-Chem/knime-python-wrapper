@@ -5,6 +5,8 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [Unreleased]
 
+## [2.0.3] - 2019-07-02
+
 ### Changed
 
 - In tests call `PythonWrapperTestUtils.init()` instead of `PythonWrapperTestUtils.materializeKNIMEPythonUtils()`.
