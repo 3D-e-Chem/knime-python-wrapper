@@ -5,11 +5,11 @@ Bundle-SymbolicName: nl.esciencecenter.e3dchem.python.plugin;singleton:=true
 Bundle-Version: 2.0.3.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: Netherlands eScience Center
-Require-Bundle: org.knime.core;bundle-version="[4.0.0,5.0.0)",
- org.knime.base;bundle-version="[4.0.0,5.0.0)",
- org.knime.python2;bundle-version="[4.0.0,5.0.0)",
- org.knime.python2.serde.csv;bundle-version="[4.0.0,5.0.0)",
- org.knime.python2.serde.flatbuffers;bundle-version="[4.0.0,5.0.0)",
- org.knime.python2.serde.arrow;bundle-version="[4.0.0,5.0.0)"
+Require-Bundle: org.knime.core;bundle-version="[4.3.0,5.0.0)",
+ org.knime.base;bundle-version="[4.3.0,5.0.0)",
+ org.knime.python2;bundle-version="[4.3.0,5.0.0)",
+ org.knime.python2.serde.csv;bundle-version="[4.3.0,5.0.0)",
+ org.knime.python2.serde.flatbuffers;bundle-version="[4.3.0,5.0.0)",
+ org.knime.python2.serde.arrow;bundle-version="[4.3.0,5.0.0)"
 Bundle-ClassPath: .
 Export-Package: nl.esciencecenter.e3dchem.python
