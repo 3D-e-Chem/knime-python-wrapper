@@ -22,14 +22,15 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 import org.knime.core.node.workflow.FlowVariable.Type;
+import org.knime.python2.PythonCommand;
 import org.knime.python2.kernel.PythonExecutionMonitorCancelable;
 import org.knime.python2.kernel.PythonKernel;
+import org.knime.python2.kernel.PythonKernelOptions;
 
 /**
  * Implements a {@link NodeModel} for nodes that launch external Python script.
  *
- * @param <C>
- *            Configuration
+ * @param <C> Configuration
  */
 public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> extends ExtToolOutputNodeModel {
 	protected C m_config = createConfig();
@@ -51,7 +52,10 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	public BufferedDataTable[] execute(BufferedDataTable[] inData, ExecutionContext exec) throws Exception {
 		// Below has been copied from Knime Python node source code and
 		// adjusted.
-		PythonKernel kernel = new PythonKernel(getConfig().getKernelOptions());
+		PythonCommand pythonCommand = getConfig().getUsePython3() ? getConfig().getPython3Command()
+				: getConfig().getPython2Command();
+		PythonKernel kernel = new PythonKernel(pythonCommand);
+		kernel.setOptions(getConfig().getKernelOptions());
 		try {
 			return executeKernel(inData, exec, kernel);
 		} finally {
@@ -96,11 +100,10 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	/**
 	 * Push new variables to the stack.
 	 *
-	 * Only pushes new variables to the stack if they are new or changed in type
-	 * or value.
+	 * Only pushes new variables to the stack if they are new or changed in type or
+	 * value.
 	 *
-	 * @param newVariables
-	 *            The flow variables to push
+	 * @param newVariables The flow variables to push
 	 */
 	protected void addNewVariables(Collection<FlowVariable> newVariables) {
 		// Below has been copied from Knime Python node source code and
