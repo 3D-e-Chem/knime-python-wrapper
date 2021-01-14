@@ -63,3 +63,11 @@ The file is formatted as described on http://keepachangelog.com/.
 
 * Abstract PythonWrapperNode classes
 * Test utility to run tests which call PythonKernel execute
+
+[Unreleased]: https://github.com/3D-e-Chem/knime-python-wrapper/compare/v2.0.4...HEAD
+[2.0.4]: https://github.com/3D-e-Chem/knime-python-wrapper/compare/v2.0.3...v2.0.4
+[2.0.3]: https://github.com/3D-e-Chem/knime-python-wrapper/compare/v2.0.2...v2.0.3
+[2.0.2]: https://github.com/3D-e-Chem/knime-python-wrapper/compare/v2.0.1...v2.0.2
+[2.0.1]: https://github.com/3D-e-Chem/knime-python-wrapper/compare/v1.1.0...v2.0.1
+[1.1.0]: https://github.com/3D-e-Chem/knime-python-wrapper/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/3D-e-Chem/knime-python-wrapper/releases/tag/v1.0.0
