@@ -69,6 +69,8 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 		return options.forSerializationOptions(options.getSerializationOptions().forSerializerId(serializerId));
 	}
 
+	// Below has been copied from KNIME Python node code (https://github.com/knime/knime-python/blob/analytics-platform/4.3.0/org.knime.python2.nodes/src/org/knime/python2/nodes/PythonNodeModel.java) and
+	// adjusted.
 	protected PythonKernel getNextKernelFromQueue(final PythonCancelable cancelable)
 			throws PythonCanceledExecutionException, PythonIOException {
 		return getNextKernelFromQueue(Collections.emptySet(), Collections.emptySet(), cancelable);
@@ -91,7 +93,7 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	}
 
 	public BufferedDataTable[] execute(BufferedDataTable[] inData, ExecutionContext exec) throws Exception {
-		// Below has been copied from Knime Python node source code and
+		// Below has been copied from KNIME Python node source code (https://github.com/knime/knime-python/blob/analytics-platform/4.3.0/org.knime.python2.nodes/src/org/knime/python2/nodes/source/PythonSourceNodeModel.java) and
 		// adjusted.
 		final PythonExecutionMonitorCancelable cancelable = new PythonExecutionMonitorCancelable(exec);
 		try (final PythonKernel kernel = getNextKernelFromQueue(cancelable)) {
