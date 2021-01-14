@@ -5,9 +5,15 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ## [Unreleased]
 
+## [2.0.4] - 2020-01-14
+
 ### Fixed
 
 * Support KNIME 4.3 ([#9](https://github.com/3D-e-Chem/knime-python-wrapper/pull/9) + [#10](https://github.com/3D-e-Chem/knime-python-wrapper/pull/10))
+
+### Removed
+
+* Support for KNIME versions older than 4.3
 
 ## [2.0.3] - 2019-07-02
 
