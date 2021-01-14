@@ -7,7 +7,7 @@ The file is formatted as described on http://keepachangelog.com/.
 
 ### Fixed
 
-* Support KNIME 4.3
+* Support KNIME 4.3 ([#9](https://github.com/3D-e-Chem/knime-python-wrapper/pull/9) + [#10](https://github.com/3D-e-Chem/knime-python-wrapper/pull/10))
 
 ## [2.0.3] - 2019-07-02
 
