@@ -7,8 +7,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.knime.base.node.util.exttool.ExtToolOutputNodeModel;
@@ -22,14 +24,21 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.workflow.FlowVariable;
 import org.knime.core.node.workflow.FlowVariable.Type;
+import org.knime.python2.PythonCommand;
+import org.knime.python2.PythonModuleSpec;
+import org.knime.python2.config.PythonFlowVariableOptions;
+import org.knime.python2.kernel.PythonCancelable;
+import org.knime.python2.kernel.PythonCanceledExecutionException;
 import org.knime.python2.kernel.PythonExecutionMonitorCancelable;
+import org.knime.python2.kernel.PythonIOException;
 import org.knime.python2.kernel.PythonKernel;
+import org.knime.python2.kernel.PythonKernelOptions;
+import org.knime.python2.kernel.PythonKernelQueue;
 
 /**
  * Implements a {@link NodeModel} for nodes that launch external Python script.
  *
- * @param <C>
- *            Configuration
+ * @param <C> Configuration
  */
 public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> extends ExtToolOutputNodeModel {
 	protected C m_config = createConfig();
@@ -48,14 +57,52 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 		return m_config;
 	}
 
+	/**
+	 * Gets the kernel specific options.
+	 *
+	 * @return the kernel specific options
+	 */
+	protected PythonKernelOptions getKernelOptions() {
+		final PythonKernelOptions options = getConfig().getKernelOptions();
+		final String serializerId = new PythonFlowVariableOptions(getAvailableFlowVariables()).getSerializerId()
+				.orElse(null);
+		return options.forSerializationOptions(options.getSerializationOptions().forSerializerId(serializerId));
+	}
+
+	// Below has been copied from KNIME Python node code (https://github.com/knime/knime-python/blob/analytics-platform/4.3.0/org.knime.python2.nodes/src/org/knime/python2/nodes/PythonNodeModel.java) and
+	// adjusted.
+	protected PythonKernel getNextKernelFromQueue(final PythonCancelable cancelable)
+			throws PythonCanceledExecutionException, PythonIOException {
+		return getNextKernelFromQueue(Collections.emptySet(), Collections.emptySet(), cancelable);
+	}
+
+	protected PythonKernel getNextKernelFromQueue(final Set<PythonModuleSpec> requiredAdditionalModules,
+			final PythonCancelable cancelable) throws PythonCanceledExecutionException, PythonIOException {
+		return getNextKernelFromQueue(requiredAdditionalModules, Collections.emptySet(), cancelable);
+	}
+
+	protected PythonKernel getNextKernelFromQueue(final Set<PythonModuleSpec> requiredAdditionalModules,
+			final Set<PythonModuleSpec> optionalAdditionalModules, final PythonCancelable cancelable)
+			throws PythonCanceledExecutionException, PythonIOException {
+		final PythonKernelOptions options = getKernelOptions();
+		final PythonCommand command = options.getUsePython3() //
+				? options.getPython3Command() //
+				: options.getPython2Command();
+		return PythonKernelQueue.getNextKernel(command, requiredAdditionalModules, optionalAdditionalModules, options,
+				cancelable);
+	}
+
 	public BufferedDataTable[] execute(BufferedDataTable[] inData, ExecutionContext exec) throws Exception {
-		// Below has been copied from Knime Python node source code and
+		// Below has been copied from KNIME Python node source code (https://github.com/knime/knime-python/blob/analytics-platform/4.3.0/org.knime.python2.nodes/src/org/knime/python2/nodes/source/PythonSourceNodeModel.java) and
 		// adjusted.
-		PythonKernel kernel = new PythonKernel(getConfig().getKernelOptions());
-		try {
-			return executeKernel(inData, exec, kernel);
-		} finally {
-			kernel.close();
+		final PythonExecutionMonitorCancelable cancelable = new PythonExecutionMonitorCancelable(exec);
+		try (final PythonKernel kernel = getNextKernelFromQueue(cancelable)) {
+			kernel.setOptions(getConfig().getKernelOptions());
+			try {
+				return executeKernel(inData, exec, kernel);
+			} finally {
+				kernel.close();
+			}
 		}
 	}
 
@@ -96,11 +143,10 @@ public abstract class PythonWrapperNodeModel<C extends PythonWrapperNodeConfig> 
 	/**
 	 * Push new variables to the stack.
 	 *
-	 * Only pushes new variables to the stack if they are new or changed in type
-	 * or value.
+	 * Only pushes new variables to the stack if they are new or changed in type or
+	 * value.
 	 *
-	 * @param newVariables
-	 *            The flow variables to push
+	 * @param newVariables The flow variables to push
 	 */
 	protected void addNewVariables(Collection<FlowVariable> newVariables) {
 		// Below has been copied from Knime Python node source code and
