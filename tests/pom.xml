@@ -16,7 +16,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.0</version>
+				<version>${jacoco.version}</version>
 				<executions>
 					<execution>
 						<goals>
@@ -40,7 +40,7 @@
 					<dependency>
 						<groupId>org.jacoco</groupId>
 						<artifactId>org.jacoco.ant</artifactId>
-						<version>0.8.0</version>
+						<version>${jacoco.version}</version>
 					</dependency>
 					<dependency>
 						<groupId>ant-contrib</groupId>
@@ -108,7 +108,9 @@
 				<artifactId>tycho-surefire-plugin</artifactId>
 				<version>${tycho.version}</version>
 				<configuration>
-					<argLine>${tycho.testArgLine} ${tycho.test.jvmArgs}</argLine>
+					<argLine>${tycho.testArgLine} 
+						${tycho.test.jvmArgs} 
+						${knime.ini.testArgs}</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -120,7 +122,27 @@
 						<extraRequirements>
 							<requirement>
 								<type>eclipse-feature</type>
+								<id>org.knime.features.clfixes</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-feature</type>
+								<id>org.knime.features.workbench</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-feature</type>
 								<id>org.knime.features.core</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-feature</type>
+								<id>org.knime.features.testing.core</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-feature</type>
+								<id>org.knime.features.base</id>
 								<versionRange>0.0.0</versionRange>
 							</requirement>
 						</extraRequirements>

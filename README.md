@@ -1,10 +1,9 @@
 Abstract Python wrapper KNIME node and helpers.
 Used for development of KNIME nodes calling Python scripts.
 
-[![Build Status](https://travis-ci.org/3D-e-Chem/knime-python-wrapper.svg?branch=master)](https://travis-ci.org/3D-e-Chem/knime-python-wrapper)
-[![Build status](https://ci.appveyor.com/api/projects/status/y7u4n23sjo25pyg8/branch/master?svg=true)](https://ci.appveyor.com/project/3D-e-Chem/knime-python-wrapper/branch/master)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python&metric=alert_status)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python&metric=coverage)](https://sonarcloud.io/dashboard?id=nl.esciencecenter.e3dchem.python%3Anl.esciencecenter.e3dchem.python)
+[![Java CI with Maven](https://github.com/3D-e-Chem/knime-python-wrapper/actions/workflows/ci.yml/badge.svg)](https://github.com/3D-e-Chem/knime-python-wrapper/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=3D-e-Chem_knime-python-wrapper&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=3D-e-Chem_knime-python-wrapper)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=3D-e-Chem_knime-python-wrapper&metric=coverage)](https://sonarcloud.io/summary/new_code?id=3D-e-Chem_knime-python-wrapper)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4537256.svg)](https://doi.org/10.5281/zenodo.4537256)
 
 The nodes in Scripting>Python folder of the node repository (nodes part of the `KNIME Python integration` plugin) the end-user needs to paste Python code in a text area in the node dialog.
@@ -16,23 +15,31 @@ The included Python script is not editable by the end-user, but can read options
 Instructions for KNIME node developers that want to call a Python script.
 Several steps must be performed:
 
-1. [Add update site](#1-add-update-site)
-2. [Add dependency](#2-add-dependency)
-3. [Implement](#3-implement)
-4. [Write tests](#4-write-tests)
+- [Usage](#usage)
+	- [Add update site](#add-update-site)
+	- [Add dependency](#add-dependency)
+	- [Implement](#implement)
+		- [Config](#config)
+		- [Dialog](#dialog)
+		- [Python script](#python-script)
+		- [Model](#model)
+	- [Write tests](#write-tests)
+- [Build](#build)
+- [Development](#development)
+- [New release](#new-release)
 
 ## Add update site
 
-The releases of this repository are available in the `https://3d-e-chem.github.io/updates` update site.
+The releases of this repository are available in the `https://3d-e-chem.github.io/updates/5.1` update site.
 
-Configure target platform by adding the `https://3d-e-chem.github.io/updates` update site with `Abstract Python wrapper KNIME node and helpers` software.
+Configure target platform by adding the `https://3d-e-chem.github.io/updates/5.1` update site with `Abstract Python wrapper KNIME node and helpers` software.
 
-To make use of it in a [Tycho based project](https://github.com/3D-e-Chem/tycho-knime-node-archetype/), add to `targetplatform/KNIME-AP-4.0.target` file the following:
+To make use of it in a [Tycho based project](https://github.com/3D-e-Chem/tycho-knime-node-archetype/), add to `targetplatform/KNIME-AP-5.1.target` file the following:
 
 ```
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 		<unit id="nl.esciencecenter.e3dchem.python.plugin" version="0.0.0"/>
-		<repository location="https://3d-e-chem.github.io/updates"/>
+		<repository location="https://3d-e-chem.github.io/updates/5.1"/>
 </location>
 ```
 
@@ -101,11 +108,11 @@ The update site can be used to perform a local installation.
 
 Steps to get development environment setup based on https://github.com/knime/knime-sdk-setup#sdk-setup:
 
-1. Install Java 8
-2. Install Eclipse for [RCP and RAP developers](https://www.eclipse.org/downloads/packages/release/2018-12/r/eclipse-ide-rcp-and-rap-developers)
-3. Configure Java 8 inside Eclipse Window > Preferences > Java > Installed JREs
+1. Install Java 17
+2. Install Eclipse for [RCP and RAP developers](hhttps://www.eclipse.org/downloads/packages/installe)
+3. Configure Java 17 inside Eclipse Window > Preferences > Java > Installed JREs
 4. Import this repo as an Existing Maven project
-5. Activate target platform by going to Window > Preferences > Plug-in Development > Target Platform and check the `KNIME Analytics Platform (4.0) - nl.esciencecenter.e3dchem.python.targetplatform/KNIME-AP-4.0.target` target definition.
+5. Activate target platform by going to Window > Preferences > Plug-in Development > Target Platform and check the `KNIME Analytics Platform (5.1) - nl.esciencecenter.e3dchem.python.targetplatform/KNIME-AP-5.1.target` target definition.
 6. A KNIME Analytics Platform instance can be started by right clicking on the `targetplatform/KNIME\ Analytics\ Platform.launch` file and selecting `Run As → KNIME Analytics Platform`. The KNIME instance will contain the target platform together with all extensions defined in the workspace.
 
 During import the Tycho Eclipse providers must be installed.
