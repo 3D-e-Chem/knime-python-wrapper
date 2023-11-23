@@ -1,3 +1,5 @@
+> # Only supported for KNIME versions <=4.3, no more changes will be made to this repo as of Nov 2023.
+
 Abstract Python wrapper KNIME node and helpers.
 Used for development of KNIME nodes calling Python scripts.
 
